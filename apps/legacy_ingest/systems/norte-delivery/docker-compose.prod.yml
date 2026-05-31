@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  # Database (Optional in Prod if using managed DB like RDS/Neon)
+  # Keeping it for complete self-hosted stack
+  db:
+    image: postgres:15-alpine
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-admin}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-admin}
+      POSTGRES_DB: ${POSTGRES_DB:-delivery_db}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - app-network
+
+  # Backend API
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile.prod
+    restart: always
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: postgres://${POSTGRES_USER:-admin}:${POSTGRES_PASSWORD:-admin}@db:5432/${POSTGRES_DB:-delivery_db}?schema=public
+      PORT: 3000
+      JWT_SECRET: ${JWT_SECRET}
+    networks:
+      - app-network
+
+  # Frontend Web
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile.prod
+    restart: always
+    ports:
+      - "80:3000"
+    environment:
+      NEXT_PUBLIC_API_URL: https://api.delivery.com # Replace with real domain
+    networks:
+      - app-network
+
+volumes:
+  postgres_data:
+
+networks:
+  app-network:
+    driver: bridge

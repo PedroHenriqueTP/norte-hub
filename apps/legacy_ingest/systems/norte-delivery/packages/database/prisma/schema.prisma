@@ -1,0 +1,579 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../dist"
+}
+
+generator client_default {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  SUPER_ADMIN
+  OWNER
+  ADMIN
+  KITCHEN
+  DRIVER
+  CUSTOMER
+  STAFF
+}
+
+enum AppSlug {
+  NORTE_AGENCY
+  NORTE_MARKET
+  NORTE_GYM
+  NORTE_BAR
+  NORTE_CLINIC
+  NORTE_BARBER
+  NORTE_AUTO
+  NORTE_BAKERY
+  NORTE_FIT
+  NORTE_TRAINING
+  NORTE_CLOCK
+  NORTE_AGENDA
+  NORTE_MAIL
+  NORTE_CLOUD
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  PREPARING
+  READY
+  DELIVERING
+  COMPLETED
+  CANCELED
+}
+
+enum OrderSource {
+  OWN_APP
+  IFOOD
+  UBER_EATS
+  WHATSAPP
+  POS
+}
+
+enum PaymentMethod {
+  CREDIT_CARD
+  DEBIT_CARD
+  PIX
+  CASH
+  VOUCHER
+  BOLETO
+  BANK_TRANSFER
+  OTHER
+}
+
+enum TransactionType {
+  INCOME
+  EXPENSE
+  REFUND
+}
+
+enum MovementType {
+  IN
+  OUT
+  LOSS
+}
+
+enum DiscountType {
+  PERCENTAGE
+  FIXED
+}
+
+enum IntegrationProvider {
+  IFOOD
+  RAPPI
+  UBER_EATS
+  NINETY_NINE_FOOD
+  GLOVO
+  JUST_EAT
+}
+
+model Tenant {
+  id           String          @id @default(uuid())
+  name         String
+  slug         String          @unique
+  plan         String          @default("FREE")
+  createdAt    DateTime        @default(now())
+  userTenants  UserTenant[]
+  features     TenantFeature[]
+  products     Product[]
+  orders       Order[]
+  categories   Category[]
+  transactions Transaction[]
+  addresses    Address[]
+  integrations Integration[]
+  tables       Table[]
+  subscriptions Subscription[]
+  invoices     Invoice[]
+  waitingLists WaitingList[]
+  ingredients  Ingredient[]
+  coupons      Coupon[]
+  workoutPlans WorkoutPlan[]
+  enrollments  Enrollment[]
+  gymCheckins   GymCheckIn[]
+  gymMemberships GymMembership[]
+  files          CloudFile[]
+
+  @@map("tenants")
+}
+
+model UserTenant {
+  id       String   @id @default(uuid())
+  userId   String
+  tenantId String
+  role     Role     @default(CUSTOMER)
+  user     User     @relation(fields: [userId], references: [id])
+  tenant   Tenant   @relation(fields: [tenantId], references: [id])
+
+  @@unique([userId, tenantId])
+  @@map("user_tenants")
+}
+
+model TenantFeature {
+  id        String   @id @default(uuid())
+  tenantId  String
+  tenant    Tenant   @relation(fields: [tenantId], references: [id])
+  feature   String
+  enabled   Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([tenantId, feature])
+  @@map("tenant_features")
+}
+
+model Subscription {
+  id        String   @id @default(uuid())
+  tenantId  String?
+  tenant    Tenant?  @relation(fields: [tenantId], references: [id])
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  appSlug   AppSlug
+  planLevel String
+  status    String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("subscriptions")
+}
+
+model User {
+  id             String          @id @default(uuid())
+  name           String
+  email          String          @unique
+  password       String
+  phone          String?
+  address        String?
+  createdAt      DateTime        @default(now())
+  tenants        UserTenant[]
+  subscriptions  Subscription[]
+  orders         Order[]
+  driverOrders   Order[]         @relation("DriverOrders")
+  addresses      Address[]
+  waitingLists   WaitingList[]
+  transactions   Transaction[]   @relation("TransactionAuthor")
+  stockMoves     StockMovement[] @relation("StockAuthor")
+  editedProducts Product[]       @relation("ProductEditor")
+  files          CloudFile[]
+  timeBlocks     TimeBlock[]
+  routineAlarms  RoutineAlarm[]
+  trainingSessions TrainingSession[]
+
+  @@map("users")
+}
+
+model Table {
+  id        Int      @id @default(autoincrement())
+  name      String
+  capacity  Int
+  status    String   @default("Livre")
+  tenantId  String
+  tenant    Tenant   @relation(fields: [tenantId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  orders    Order[]
+
+  @@map("tables")
+}
+
+model WaitingList {
+  id        String   @id @default(uuid())
+  name      String
+  phone     String?
+  email     String?
+  partySize Int
+  status    String   @default("WAITING")
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id])
+  tenantId  String
+  tenant    Tenant   @relation(fields: [tenantId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("waiting_list")
+}
+
+model Address {
+  id           String   @id @default(uuid())
+  street       String
+  number       String
+  complement   String?
+  neighborhood String
+  city         String
+  zipCode      String
+  userId       String
+  user         User     @relation(fields: [userId], references: [id])
+  tenantId     String
+  tenant       Tenant   @relation(fields: [tenantId], references: [id])
+  orders       Order[]
+
+  @@map("addresses")
+}
+
+model Category {
+  id       String    @id @default(uuid())
+  name     String
+  tenantId String
+  tenant   Tenant    @relation(fields: [tenantId], references: [id])
+  products Product[]
+
+  @@map("categories")
+}
+
+model Product {
+  id           String          @id @default(uuid())
+  name         String
+  description  String?
+  price        Decimal         @db.Decimal(10, 2)
+  imageUrl     String?
+  isActive     Boolean         @default(true)
+  categoryId   String
+  category     Category        @relation(fields: [categoryId], references: [id])
+  tenantId     String
+  tenant       Tenant          @relation(fields: [tenantId], references: [id])
+  orderItems   OrderItem[]
+  recipes      ProductRecipe[]
+  lastEditorId String?
+  lastEditor   User?           @relation("ProductEditor", fields: [lastEditorId], references: [id])
+  updatedAt    DateTime        @updatedAt
+
+  @@map("products")
+}
+
+model Order {
+  id            String      @id @default(uuid())
+  incrementalId Int         @default(autoincrement())
+  userId        String?
+  user          User?       @relation(fields: [userId], references: [id])
+  addressId     String?
+  address       Address?    @relation(fields: [addressId], references: [id])
+  tenantId      String
+  tenant        Tenant      @relation(fields: [tenantId], references: [id])
+  driverId      String?
+  driver        User?       @relation("DriverOrders", fields: [driverId], references: [id])
+  subtotal      Decimal     @db.Decimal(10, 2)
+  deliveryFee   Decimal     @db.Decimal(10, 2) @default(0.00)
+  discount      Decimal     @db.Decimal(10, 2) @default(0.00)
+  total         Decimal     @db.Decimal(10, 2)
+  status        OrderStatus @default(PENDING)
+  source        OrderSource @default(OWN_APP)
+  externalId    String?     @unique
+  notes         String?
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  items         OrderItem[]
+  transactions  Transaction[]
+  invoice       Invoice?
+  tableId       Int?
+  table         Table?      @relation(fields: [tableId], references: [id])
+
+  @@map("orders")
+}
+
+model OrderItem {
+  id          String  @id @default(uuid())
+  orderId     String
+  order       Order   @relation(fields: [orderId], references: [id])
+  productId   String
+  product     Product @relation(fields: [productId], references: [id])
+  quantity    Int
+  price       Decimal @db.Decimal(10, 2)
+  observation String?
+
+  @@map("order_items")
+}
+
+model Transaction {
+  id            String          @id @default(uuid())
+  amount        Decimal         @db.Decimal(10, 2)
+  type          TransactionType
+  description   String?
+  category      String?
+  attachmentUrl String?
+  occurredAt    DateTime        @default(now())
+  paymentMethod PaymentMethod?
+  tenantId      String
+  tenant        Tenant          @relation(fields: [tenantId], references: [id])
+  netAmount     Decimal?        @db.Decimal(10, 2)
+  feeAmount     Decimal?        @db.Decimal(10, 2)
+  orderId       String?
+  order         Order?          @relation(fields: [orderId], references: [id])
+  createdAt     DateTime        @default(now())
+  authorId      String?
+  author        User?           @relation("TransactionAuthor", fields: [authorId], references: [id])
+
+  @@map("transactions")
+}
+
+model Invoice {
+  id        String    @id @default(uuid())
+  status    String    @default("PENDING")
+  number    String?
+  series    String?
+  pdfUrl    String?
+  xmlUrl    String?
+  issuedAt  DateTime?
+  orderId   String    @unique
+  order     Order     @relation(fields: [orderId], references: [id])
+  tenantId  String
+  tenant    Tenant    @relation(fields: [tenantId], references: [id])
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@map("invoices")
+}
+
+model Integration {
+  id           String              @id @default(uuid())
+  provider     IntegrationProvider
+  isActive     Boolean             @default(false)
+  merchantId   String?
+  accessToken  String?
+  refreshToken String?
+  clientId     String?
+  clientSecret String?
+  settings     Json?
+  tenantId     String
+  tenant       Tenant              @relation(fields: [tenantId], references: [id])
+  createdAt    DateTime            @default(now())
+  updatedAt    DateTime            @updatedAt
+
+  @@unique([tenantId, provider])
+  @@map("integrations")
+}
+
+model Ingredient {
+  id            String          @id @default(uuid())
+  name          String
+  unit          String
+  totalQuantity Decimal         @default(0) @db.Decimal(10, 2)
+  totalCost     Decimal         @default(0) @db.Decimal(10, 2)
+  yield         Decimal         @default(1) @db.Decimal(10, 2)
+  unitCost      Decimal         @default(0) @db.Decimal(10, 2)
+  costPrice     Decimal         @default(0) @db.Decimal(10, 2)
+  currentStock  Decimal         @default(0) @db.Decimal(10, 2)
+  minStock      Decimal         @default(50) @db.Decimal(10, 2)
+  tenantId      String
+  tenant        Tenant          @relation(fields: [tenantId], references: [id])
+  recipes       ProductRecipe[]
+  movements     StockMovement[]
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+
+  @@map("ingredients")
+}
+
+model ProductRecipe {
+  id           String     @id @default(uuid())
+  productId    String
+  product      Product    @relation(fields: [productId], references: [id])
+  ingredientId String
+  ingredient   Ingredient @relation(fields: [ingredientId], references: [id])
+  quantity     Decimal    @db.Decimal(10, 4)
+
+  @@unique([productId, ingredientId])
+  @@map("product_recipes")
+}
+
+model StockMovement {
+  id           String       @id @default(uuid())
+  type         MovementType
+  quantity     Decimal      @db.Decimal(10, 4)
+  cost         Decimal?     @db.Decimal(10, 2)
+  ingredientId String
+  ingredient   Ingredient   @relation(fields: [ingredientId], references: [id])
+  description  String?
+  createdAt    DateTime     @default(now())
+  authorId     String?
+  author       User?        @relation("StockAuthor", fields: [authorId], references: [id])
+
+  @@map("stock_movements")
+}
+
+model Coupon {
+  id            String       @id @default(uuid())
+  code          String       @unique
+  discountType  DiscountType
+  value         Decimal      @db.Decimal(10, 2)
+  minOrderValue Decimal?     @db.Decimal(10, 2)
+  maxDiscount   Decimal?     @db.Decimal(10, 2)
+  usageLimit    Int?
+  usedCount     Int          @default(0)
+  expiresAt     DateTime?
+  isActive      Boolean      @default(true)
+  tenantId      String
+  tenant       Tenant       @relation(fields: [tenantId], references: [id])
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  @@map("coupons")
+}
+
+model WorkoutPlan {
+  id          String       @id @default(uuid())
+  title       String
+  description String?
+  exercises   Json
+  tenantId    String
+  tenant      Tenant       @relation(fields: [tenantId], references: [id])
+  enrollments Enrollment[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  @@map("workout_plans")
+}
+
+model Enrollment {
+  id            String       @id @default(uuid())
+  studentName   String
+  studentEmail  String
+  status        String
+  startDate     DateTime     @default(now())
+  endDate       DateTime?
+  workoutPlanId String?
+  workoutPlan   WorkoutPlan? @relation(fields: [workoutPlanId], references: [id])
+  tenantId      String
+  tenant        Tenant       @relation(fields: [tenantId], references: [id])
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  @@map("enrollments")
+}
+
+model GymCheckIn {
+  id          String   @id @default(uuid())
+  studentName String
+  studentEmail String
+  status      String
+  occurredAt  DateTime @default(now())
+  tenantId    String
+  tenant      Tenant   @relation(fields: [tenantId], references: [id])
+
+  @@map("gym_checkins")
+}
+
+model GymMembership {
+  id           String   @id @default(uuid())
+  studentName  String
+  studentEmail String
+  price        Decimal  @db.Decimal(10, 2)
+  status       String
+  startDate    DateTime @default(now())
+  endDate      DateTime
+  tenantId     String
+  tenant       Tenant   @relation(fields: [tenantId], references: [id])
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@map("gym_memberships")
+}
+
+model CloudFile {
+  id        String   @id @default(uuid())
+  name      String
+  mimeType  String
+  size      Int
+  url       String
+  path      String
+  tenantId  String?
+  userId    String
+  summary   String?
+  tags      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  tenant    Tenant?  @relation(fields: [tenantId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@map("cloud_files")
+}
+
+model TimeBlock {
+  id          String   @id @default(uuid())
+  userId      String
+  title       String
+  description String?
+  type        String
+  duration    Int
+  timeSpent   Int      @default(0)
+  completed   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user        User     @relation(fields: [userId], references: [id])
+
+  @@map("time_blocks")
+}
+
+model RoutineAlarm {
+  id        String   @id @default(uuid())
+  userId    String
+  title     String
+  time      String
+  days      String
+  isActive  Boolean  @default(true)
+  soundUrl  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@map("routine_alarms")
+}
+
+model TrainingSession {
+  id          String        @id @default(uuid())
+  userId      String
+  name        String
+  notes       String?
+  completedAt DateTime?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  user        User          @relation(fields: [userId], references: [id])
+  exercises   ExerciseLog[]
+
+  @@map("training_sessions")
+}
+
+model ExerciseLog {
+  id          String          @id @default(uuid())
+  sessionId   String
+  name        String
+  sets        Int
+  reps        Int
+  weightKg    Float           @default(0)
+  notes       String?
+  createdAt   DateTime        @default(now())
+
+  session     TrainingSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@map("exercise_logs")
+}

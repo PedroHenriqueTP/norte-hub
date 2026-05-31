@@ -1,0 +1,8 @@
+﻿{
+    "dependencies":  {
+                         "framer-motion":  "^12.26.2",
+                         "motion-dom":  "^12.26.2"
+                     },
+    "author":  "Pedrão da Norte",
+    "brand":  "Norte Systems"
+}

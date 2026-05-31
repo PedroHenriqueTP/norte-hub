@@ -1,0 +1,38 @@
+{
+    "name":  "norte-delivery",
+    "private":  true,
+    "workspaces":  [
+                       "apps/*",
+                       "packages/*"
+                   ],
+    "engines":  {
+                    "node":  "\u003e=18.0.0"
+                },
+    "packageManager":  "npm@9.8.1",
+    "scripts":  {
+                    "dev":  "turbo run dev",
+                    "build":  "turbo run build",
+                    "test":  "turbo run test",
+                    "clean":  "turbo run clean",
+                    "squad:daily":  "ts-node scripts/ai-squad/06-nexus-one.ts",
+                    "task:force":  "ts-node scripts/ai-squad/03-task-force.ts"
+                },
+    "dependencies":  {
+                         "node-fetch":  "^3.3.2"
+                     },
+    "devDependencies":  {
+                            "turbo":  "latest",
+                            "ts-node":  "^10.9.2",
+                            "typescript":  "^5.3.3",
+                            "chalk":  "^4.1.2",
+                            "glob":  "^10.3.10",
+                            "inquirer":  "^8.2.6",
+                            "shelljs":  "^0.8.5",
+                            "@types/node":  "^20.11.16",
+                            "@types/inquirer":  "^9.0.7",
+                            "@types/glob":  "^8.1.0",
+                            "@types/shelljs":  "^0.8.15"
+                        },
+    "author":  "Pedrão da Norte",
+    "brand":  "Norte Systems"
+}

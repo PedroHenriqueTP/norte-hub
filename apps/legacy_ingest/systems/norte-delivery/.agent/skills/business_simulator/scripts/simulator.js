@@ -1,0 +1,317 @@
+const http = require('http');
+const crypto = require('crypto');
+
+// Configuração
+const API_URL = 'http://localhost:3000';
+const SIMULATION_SPEEDS = {
+    normal: 3000,
+    fast: 1000,
+    chaos: 100
+};
+const TENANTS_SEED = [
+    { name: 'Pizzaria do Luigi', email: 'luigi@pizza.com', password: 'password123', category: 'Italian' },
+    { name: 'Burger King Fake', email: 'bk@fake.com', password: 'password123', category: 'Fast Food' },
+    { name: 'Sushi Express', email: 'sushi@express.com', password: 'password123', category: 'Japanese' }
+];
+
+// Estado da Simulação
+let tenants = [];
+let cycleCount = 0;
+let paymentStats = {
+    approved: { count: 0, amount: 0 },
+    declined: { count: 0, amount: 0 },
+    pending: { count: 0 },
+    avgResponseTime: 0,
+    totalRequests: 0
+};
+
+// --- Utilitários HTTP ---
+function request(method, path, data = null, token = null) {
+    return new Promise((resolve, reject) => {
+        const url = new URL(path, API_URL);
+        const options = {
+            method: method,
+            headers: { 'Content-Type': 'application/json' }
+        };
+
+        if (token) options.headers['Authorization'] = `Bearer ${token}`;
+
+        const start = Date.now();
+        const req = http.request(url, options, (res) => {
+            let body = '';
+            res.on('data', (chunk) => body += chunk);
+            res.on('end', () => {
+                const duration = Date.now() - start;
+                updateResponseTime(duration);
+
+                try {
+                    const parsed = JSON.parse(body);
+                    if (res.statusCode >= 200 && res.statusCode < 300) {
+                        resolve(parsed);
+                    } else {
+                        reject({ statusCode: res.statusCode, error: parsed });
+                    }
+                } catch (e) {
+                    resolve(body);
+                }
+            });
+        });
+
+        req.on('error', (e) => reject(e));
+        if (data) req.write(JSON.stringify(data));
+        req.end();
+    });
+}
+
+function updateResponseTime(duration) {
+    const totalTime = paymentStats.avgResponseTime * paymentStats.totalRequests;
+    paymentStats.totalRequests++;
+    paymentStats.avgResponseTime = (totalTime + duration) / paymentStats.totalRequests;
+}
+
+// --- Módulo Payment Gateway Mock ---
+function mockPaymentOutcome(amount) {
+    const rand = Math.random();
+    if (rand < 0.70) return { status: 'APPROVED', reason: 'Authorized' };
+    if (rand < 0.85) return { status: 'DECLINED', reason: 'Insufficient Funds' };
+    if (rand < 0.95) return { status: 'PENDING', reason: 'Fraud Review' };
+    return { status: 'ERROR', reason: 'Gateway Timeout' };
+}
+
+// Simula Webhook
+async function sendWebhook(orderId, status) {
+    const delay = Math.floor(Math.random() * 8000) + 2000; // 2-10s
+    setTimeout(async () => {
+        try {
+            // Assumindo endpoint de webhook (ajustar conforme API real)
+            // Se não existir, vai apenas logar o erro, o que é esperado no teste.
+            await request('POST', '/webhooks/payments/notify', {
+                orderId,
+                status,
+                gatewayTransactionId: `tx_${Date.now()}`
+            });
+            // Atualiza stats locais se webhook for processado
+            if (status === 'APPROVED') paymentStats.pending.count--;
+        } catch (e) {
+            // console.log(`⚠️ Webhook failed for ${orderId}: ${e.message}`);
+        }
+    }, delay);
+}
+
+
+// --- Lógica de Negócio ---
+
+async function seedTenants() {
+    console.log('🌱 Checking seed data...');
+    for (const t of TENANTS_SEED) {
+        try {
+            let auth = null;
+            try {
+                auth = await request('POST', '/auth/login', { email: t.email, password: t.password });
+            } catch (e) {
+                try {
+                    await request('POST', '/auth/register', {
+                        name: t.name, email: t.email, password: t.password, role: 'ADMIN'
+                    });
+                    auth = await request('POST', '/auth/login', { email: t.email, password: t.password });
+                } catch (regErr) { continue; }
+            }
+
+            if (auth && auth.accessToken) {
+                tenants.push({
+                    id: t.email,
+                    token: auth.accessToken,
+                    name: t.name,
+                    balance: 1000,
+                    stats: { orders: 0, expenses: 0, earnings: 0 }
+                });
+                await ensureProducts(auth.accessToken);
+            }
+        } catch (e) { }
+    }
+    console.log(`✅ Loaded ${tenants.length} tenants.`);
+}
+
+async function ensureProducts(token) {
+    try {
+        const prods = await request('GET', '/products', null, token);
+        if (Array.isArray(prods) && prods.length === 0) {
+            await request('POST', '/products', {
+                name: 'Simulated Product',
+                description: 'Generated by Simulator',
+                price: 25.50,
+                categoryId: 'uuid-placeholder'
+            }, token);
+        }
+    } catch (e) { }
+}
+
+async function simulateOrder(tenant) {
+    try {
+        let prods = [];
+        try { prods = await request('GET', '/products', null, tenant.token); } catch (e) { }
+        if (!prods || prods.length === 0) return;
+
+        const product = prods[Math.floor(Math.random() * prods.length)];
+
+        // 1. Simular Decisão do Gateway (Mock)
+        const paymentOutcome = mockPaymentOutcome(product.price);
+
+        // Se Gateway "recusar" antes mesmo de chamar a API (ex: validação frontend), paramos aqui?
+        // Não, a ideia é testar a API. Então enviamos o pedido e a API que integraria com o Gateway.
+        // MAS como a API "real" pode não ter esse mock embutido, vamos simular o comportamento
+        // variando o método de pagamento ou payload se possível.
+
+        // Para este exercício, assumimos que a API aceita o pedido e o processamento de pagamento
+        // acontece lá. O Mock Gateway aqui é "Conceitual": nós vamos enviar o pedido e
+        // SE a API tiver um endpoint de webhook, nós vamos chamá-lo.
+        // SE a API for síncrona, simulamos o resultado no log.
+
+        const orderDto = {
+            items: [{ productId: product.id, quantity: 1 }],
+            customer: { name: 'Simulated Client', email: `client${Date.now()}@test.com` },
+            paymentMethod: paymentOutcome.status === 'PENDING' ? 'PIX' : 'CREDIT_CARD',
+            deliveryFee: 5.00
+        };
+
+        const startBalance = tenant.balance;
+
+        // API Call
+        const order = await request('POST', '/orders', orderDto, tenant.token);
+        const total = parseFloat(order.total);
+
+        // Processar Resultado Mockado
+        if (paymentOutcome.status === 'APPROVED') {
+            tenant.stats.orders++;
+            tenant.stats.earnings += total;
+            tenant.balance += total;
+
+            paymentStats.approved.count++;
+            paymentStats.approved.amount += total;
+
+            console.log(`🟢 [${tenant.name}] Venda #${tenant.stats.orders} Aprovada - R$${total.toFixed(2)}`);
+
+        } else if (paymentOutcome.status === 'PENDING') {
+            paymentStats.pending.count++;
+            console.log(`⚠️ [${tenant.name}] Venda Pendente (Pix/Análise) - R$${total.toFixed(2)} - Aguardando Webhook...`);
+            // Disparar Webhook Assíncrono
+            sendWebhook(order.id, 'APPROVED'); // Webhook eventualmente aprova
+        } else {
+            paymentStats.declined.count++;
+            paymentStats.declined.amount += total;
+            console.log(`🔴 [${tenant.name}] Venda Recusada (${paymentOutcome.reason}) - R$${total.toFixed(2)}`);
+        }
+
+    } catch (e) {
+        // console.log(`🔴 [${tenant.name}] Erro API:`, e.error?.message || e.message);
+    }
+}
+
+async function simulateExpense(tenant) {
+    const amount = (Math.random() * 50).toFixed(2);
+    try {
+        await request('POST', '/finance/transactions', {
+            amount: -Math.abs(amount),
+            type: 'EXPENSE',
+            description: 'Compra de Insumos (Simulado)',
+            paymentMethod: 'CASH'
+        }, tenant.token);
+
+        tenant.stats.expenses++;
+        tenant.balance -= parseFloat(amount);
+        console.log(`💸 [${tenant.name}] Despesa -R$${amount}`);
+    } catch (e) {
+        tenant.balance -= parseFloat(amount);
+    }
+}
+
+function printDashboard() {
+    console.clear();
+    console.log(`
+╔══════════════════════════════════════════════════════════════╗
+║ 🏢 DELIVERY ECOSYSTEM & PAYMENT GATEWAY - Cycle ${cycleCount.toString().padEnd(4)}         ║
+╠════════════════════════════════╤══════════════╤══════════════╣
+║ Tenant                         │ Saldo (Sim)  │ Pedidos      ║
+╠════════════════════════════════╪══════════════╪══════════════╣`);
+
+    tenants.forEach(t => {
+        const balanceStr = `R$ ${t.balance.toFixed(2)}`;
+        const ordersStr = t.stats.orders.toString();
+        console.log(`║ ${t.name.padEnd(30)} │ ${balanceStr.padEnd(12)} │ ${ordersStr.padEnd(12)} ║`);
+    });
+    console.log(`╠════════════════════════════════╧══════════════╧══════════════╣`);
+    console.log(`║ 💳 Payment Gateway Status                                    ║`);
+    console.log(`║ 🟢 Aprovados: ${paymentStats.approved.count.toString().padEnd(4)} (R$ ${paymentStats.approved.amount.toFixed(2).padEnd(9)})                       ║`);
+    console.log(`║ 🔴 Recusados: ${paymentStats.declined.count.toString().padEnd(4)} (R$ ${paymentStats.declined.amount.toFixed(2).padEnd(9)}) - Risk/Saldo         ║`);
+    console.log(`║ ⚠️ Pendentes: ${paymentStats.pending.count.toString().padEnd(4)} (Webhook Waiting)                          ║`);
+    console.log(`║ ⏱️ Avg Latency: ${paymentStats.avgResponseTime.toFixed(0)}ms                                         ║`);
+    console.log(`╚══════════════════════════════════════════════════════════════╝`);
+    console.log('Events:');
+}
+
+// --- Stress Mode ---
+async function runStressTest(count) {
+    await seedTenants();
+    const tenant = tenants[0];
+    if (!tenant) return;
+
+    console.log(`🔥 Starting STRESS TEST: ${count} concurrent orders for ${tenant.name}...`);
+
+    const promises = [];
+    for (let i = 0; i < count; i++) {
+        promises.push(simulateOrder(tenant));
+    }
+
+    await Promise.all(promises);
+    console.log('✅ Stress test completed. Check database for consistency.');
+    printDashboard();
+}
+
+// --- Main Loop ---
+
+async function startSimulation(speedMode = 'normal') {
+    const interval = SIMULATION_SPEEDS[speedMode] || 3000;
+
+    await seedTenants();
+    if (tenants.length === 0) {
+        console.error('❌ No tenants available.');
+        process.exit(1);
+    }
+
+    console.log(`🚀 Starting simulation (Speed: ${speedMode}, Interval: ${interval}ms)...`);
+
+    setInterval(async () => {
+        cycleCount++;
+        const tenant = tenants[Math.floor(Math.random() * tenants.length)];
+        const rand = Math.random();
+
+        if (rand < 0.7) {
+            await simulateOrder(tenant);
+        } else if (rand < 0.9) {
+            await simulateExpense(tenant);
+        }
+
+        printDashboard();
+
+        if (cycleCount % 30 === 0) {
+            console.log('💰 [PAYROLL] Executando folha de pagamento...');
+            tenants.forEach(t => t.balance -= 500);
+        }
+
+    }, interval);
+}
+
+// CLI Args
+const args = process.argv.slice(2);
+const command = args[0] || 'start';
+const arg1 = args[1];
+
+if (command === 'start') {
+    startSimulation(arg1);
+} else if (command === 'stress') {
+    runStressTest(parseInt(arg1) || 10);
+} else if (command === 'payroll') {
+    console.log('Running Payroll manually...');
+} else {
+    console.log('Usage: node simulator.js [start|stress|payroll] [arg]');
+}

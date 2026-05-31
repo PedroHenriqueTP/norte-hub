@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  norte-db-cluster:
+    image: postgres:15-alpine
+    container_name: norte_global_db
+    environment:
+      POSTGRES_USER: pedrao_admin
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-Pe070501$$}
+      POSTGRES_DB: norte_global_hub
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./postgres_data:/var/lib/postgresql/data
+    restart: always
+
+  redis-cache:
+    image: redis:alpine
+    container_name: norte_redis
+    ports:
+      - "6379:6379"
+    restart: always

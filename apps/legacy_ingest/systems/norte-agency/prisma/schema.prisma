@@ -1,0 +1,984 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  // previewFeatures = ["postgresqlExtensions"] 
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  // extensions = [vector]
+}
+
+// --- GLOBAL LEVEL (Shared across all tenants) ---
+
+model FreelancerProfile {
+  id          String   @id @default(uuid())
+  name        String
+  email       String   @unique
+  skills      String[]
+  rating      Float    @default(0.0)
+  hourlyRate  Decimal  @db.Decimal(10, 2)
+  portfolioUrl String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  allocations JobAllocation[] 
+  
+  @@index([email])
+}
+
+// --- TENANT LEVEL (Isolated by tenant_id) ---
+
+model Tenant {
+  id          String   @id @default(uuid())
+  name        String
+  slug        String   @unique
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  document    String?
+
+  // Data Ownership
+  users       User[]
+  jobs        Job[]
+  clients     Client[]
+  suppliers   Supplier[]
+  transactions Transaction[]
+  proposals   Proposal[]
+  documents   Document[]
+  allocations JobAllocation[]
+  proposalItems ProposalItem[]
+  marketplaces MarketplaceAsset[]
+  
+  // Fintech & Gastro Hub Extensions
+  wallets     DigitalWallet[]
+  ledgers     TransactionLedger[]
+  tables      RestaurantTable[]
+  comandas    Comanda[]
+  infoproducts Infoproduct[]
+  enrollments  Enrollment[]
+  
+  // Norte Performance & Productivity
+  taskBoards   TaskBoard[]
+  physicalRoutines PhysicalRoutine[]
+  nutritionLogs NutritionLog[]
+  
+  // Social Graph
+  socialEvents SocialEvent[]
+  
+  // SMM Hub (Social & Ads Manager)
+  socialAccounts SocialAccount[]
+  postSchedules  PostSchedule[]
+  socialMetrics  SocialMetric[]
+
+  // Neural Cortex (AI Context & Memory)
+  aiContexts     AIContext[]
+  aiSkills       AISkill[]
+  userRoadmaps   UserRoadmap[]
+
+  // SaaS Maker (Multi-tenant Level 2)
+  userProjects   UserProject[]
+  stories        Story[]
+  directMessages DirectMessage[]
+  mediaAssets    MediaAsset[]
+  audioProjects  AudioProject[]
+  videoDrafts    VideoDraft[]
+}
+
+enum Role {
+  SUPER_ADMIN // SaaS Owner
+  OWNER       // Agency Owner
+  DIRECTOR    // New Role
+  SUPERVISOR  // New Role
+  FINANCE
+  HR
+  PRODUCER_GENERAL
+  PRODUCER_SUPPORT
+  FREELANCER_EXTERNAL
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String
+  name      String?
+  password  String?  // Hashed password for Credentials Auth
+  document  String?
+  role      Role     @default(PRODUCER_SUPPORT)
+  tenantId    String
+  
+  tenant    Tenant   @relation(fields: [tenantId], references: [id])
+  
+  // Relations
+  createdJobs Job[]  @relation("CreatedJobs")
+  
+  // Job Item Tracking
+  requestedItems JobItem[] @relation("ItemRequestedBy")
+  approvedItems  JobItem[] @relation("ItemApprovedBy")
+  producedItems  JobItem[] @relation("ItemProducedBy")
+
+  // Performance Tracking
+  physicalRoutines PhysicalRoutine[]
+  nutritionLogs    NutritionLog[]
+  taskBoards       TaskBoard[]
+
+  // Social Graph
+  profile          Profile?
+  activities       SocialEvent[]
+  stories          Story[]
+  matchesA         AffinityMatch[] @relation("MatchesA")
+  matchesB         AffinityMatch[] @relation("MatchesB")
+  sentMessages     DirectMessage[] @relation("SentMessages")
+  receivedMessages DirectMessage[] @relation("ReceivedMessages")
+  connectionsInitiated Connection[] @relation("Initiator")
+  connectionsReceived  Connection[] @relation("Receiver")
+
+  // Context & Memory (CÃƒÂ³rtex Neural)
+  aiContexts       AIContext[]
+  roadmaps         UserRoadmap[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([email, tenantId]) // User can belong to multiple tenants distinct emails theoretically, but usually unique per tenant
+  @@index([tenantId])
+}
+
+model Client {
+  id        String   @id @default(uuid())
+  name      String
+  document  String? // CNPJ/CPF
+  email     String?
+  phone     String?
+  address   String?
+  city      String?
+  state     String?
+  zipCode   String?
+  
+  tenantId  String
+
+  tenant    Tenant   @relation(fields: [tenantId], references: [id])
+  jobs      Job[]
+  proposals Proposal[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([tenantId])
+}
+
+enum JobStatus {
+  QUOTATION_REQUESTED // OrÃƒÂ§amento Pedido
+  QUOTATION_APPROVED  // OrÃƒÂ§amento Aprovado
+  IN_PROGRESS         // Em ProduÃƒÂ§ÃƒÂ£o
+  COMPLETED           // ConcluÃƒÂ­do
+  CANCELED            // Cancelado
+  DRAFT               // Rascunho (legacy/initial)
+  ACTIVE              // Em Andamento (legacy - map to IN_PROGRESS in UI if needed)
+}
+
+model Job {
+  id          String    @id @default(uuid())
+  title       String
+  description String?
+  status      JobStatus @default(DRAFT)
+  budget      Decimal   @db.Decimal(15, 2) @default(0)
+  deadline    DateTime?
+  
+  clientId    String
+  client      Client    @relation(fields: [clientId], references: [id])
+
+  tenantId    String
+  tenant      Tenant    @relation(fields: [tenantId], references: [id])
+
+  createdById String
+  createdBy   User      @relation("CreatedJobs", fields: [createdById], references: [id])
+
+  // Relations
+  allocations  JobAllocation[]
+  transactions Transaction[]
+  documents    Document[]
+  items        JobItem[]
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([tenantId])
+  @@index([clientId])
+}
+
+enum AllocationType {
+  FREELANCER
+  INTERNAL_USER
+  RESOURCE // e.g., Room, Equipment
+}
+
+model JobAllocation {
+  id            String         @id @default(uuid())
+  jobId         String
+  job           Job            @relation(fields: [jobId], references: [id])
+  tenantId      String
+  tenant        Tenant         @relation(fields: [tenantId], references: [id])
+  
+  type          AllocationType
+  
+  // If type == FREELANCER
+  freelancerId  String?
+  freelancer    FreelancerProfile? @relation(fields: [freelancerId], references: [id])
+
+  // If type == INTERNAL_USER
+  userId        String?
+  // user relation can be added if needed, usually just tracking ID here for resource management
+
+  startDate     DateTime
+  endDate       DateTime
+  cost          Decimal        @db.Decimal(10, 2) // Agreed cost for this allocation
+  
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  @@index([jobId])
+  @@index([tenantId])
+  @@index([freelancerId])
+}
+
+enum TransactionType {
+  INCOME  // Recebivel via Invoice
+  EXPENSE // Pagavel
+}
+
+enum CategoryType {
+  PRODUCTION
+  LOGISTICS
+  TALENT
+  MARKETING
+  TAXES
+  OTHER
+}
+
+model Transaction {
+  id          String          @id @default(uuid())
+  description String
+  amount      Decimal         @db.Decimal(15, 2)
+  type        TransactionType
+  category    CategoryType
+  date        DateTime
+  
+  jobId       String?
+  job         Job?            @relation(fields: [jobId], references: [id])
+
+  tenantId    String
+  tenant      Tenant          @relation(fields: [tenantId], references: [id])
+
+  supplier    String?         // Simple string for MVP, could be relation
+  invoiceUrl  String?         // Link to stored file
+
+  isVerified  Boolean         @default(false) // Copilot can create unverified drafts
+
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  @@index([tenantId])
+  @@index([jobId])
+}
+
+model Document {
+  id          String   @id @default(uuid())
+  name        String
+  url         String
+  content     String?  // Extracted text for search
+  
+  // Vector search support - waiting for PGVector setup, but schema field can be prepared
+  // embedding   Unsupported("vector(1536)")? 
+
+  jobId       String
+  job         Job      @relation(fields: [jobId], references: [id])
+  tenantId    String
+  tenant      Tenant   @relation(fields: [tenantId], references: [id])
+
+  createdAt   DateTime @default(now())
+  @@index([jobId])
+  @@index([tenantId])
+}
+
+enum JobItemStatus {
+  BUDGETED      // OrÃƒÂ§ado
+  APPROVED      // Aprovado (Diretor/Supervisor)
+  IN_PRODUCTION // Em ProduÃƒÂ§ÃƒÂ£o (Fornecedor)
+  IN_STOCK      // Em Estoque (Pronto para entrega)
+  DELIVERED     // Entregue (Cliente recebeu)
+  PAID          // Pago (Financeiro confirmou)
+}
+
+model JobItem {
+  id          String   @id @default(uuid())
+  title       String   @default("Item") // Nome do item
+  description String?  // DescriÃƒÂ§ÃƒÂ£o detalhada
+  quantity    Int      @default(1)
+  unitPrice   Decimal  @db.Decimal(10, 2) // PreÃƒÂ§o OrÃƒÂ§ado (Client Price)
+  unitCost    Decimal  @db.Decimal(10, 2) @default(0) // Custo de ProduÃƒÂ§ÃƒÂ£o (Internal Cost)
+  
+  status      JobItemStatus @default(BUDGETED)
+
+  // Tracking Fields
+  requestedById String?
+  requestedBy   User?     @relation("ItemRequestedBy", fields: [requestedById], references: [id])
+
+  approvedById  String?
+  approvedBy    User?     @relation("ItemApprovedBy", fields: [approvedById], references: [id])
+
+  producedById  String?
+  producedBy    User?     @relation("ItemProducedBy", fields: [producedById], references: [id])
+
+  supplierId    String?
+  supplier      Supplier? @relation(fields: [supplierId], references: [id])
+
+  paymentMethod String?   // MÃƒÂ©todo de pagamento
+  receivedAt    DateTime? // Recebido em
+
+  jobId       String
+  job         Job      @relation(fields: [jobId], references: [id])
+  tenantId    String
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([tenantId])
+  @@index([jobId])
+}
+
+model Supplier {
+  id        String   @id @default(uuid())
+  name      String
+  document  String? // CNPJ/CPF
+  email     String?
+  phone     String?
+  address   String?
+  city      String?
+  state     String?
+  zipCode   String?
+  category  String?
+  
+  tenantId  String
+  tenant    Tenant   @relation(fields: [tenantId], references: [id])
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  items     JobItem[]
+
+  @@index([tenantId])
+}
+
+enum ProposalStatus {
+  DRAFT
+  SENT
+  APPROVED
+  REJECTED
+}
+
+model Proposal {
+  id          String         @id @default(uuid())
+  number      Int            @default(autoincrement()) // For display ID (e.g. #1001) - Optional, uuid is safer but users like numbers
+  title       String
+  description String?
+  status      ProposalStatus @default(DRAFT)
+  value       Decimal        @db.Decimal(15, 2) @default(0)
+  validUntil  DateTime?
+  
+  clientId    String
+  client      Client         @relation(fields: [clientId], references: [id])
+
+  tenantId    String
+  tenant      Tenant         @relation(fields: [tenantId], references: [id])
+
+  items       ProposalItem[]
+
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  @@index([tenantId])
+  @@index([clientId])
+}
+
+model ProposalItem {
+  id          String   @id @default(uuid())
+  description String
+  quantity    Int      @default(1)
+  unitPrice   Decimal  @db.Decimal(10, 2)
+  
+  proposalId  String
+  proposal    Proposal @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+  tenantId    String
+  tenant      Tenant   @relation(fields: [tenantId], references: [id])
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([proposalId])
+  @@index([tenantId])
+}
+
+model MarketplaceAsset {
+  id          String   @id @default(uuid())
+  name        String
+  url         String?
+  apiKey      String   @unique @default(uuid())
+  
+  totalLeads  Int      @default(0)
+  totalSales  Decimal  @db.Decimal(15, 2) @default(0)
+  
+  tenantId    String
+  tenant      Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([tenantId])
+}
+
+// --- FINTECH MODULE: DIGITAL WALLET & CASHBACK ---
+
+model DigitalWallet {
+  id          String   @id @default(uuid())
+  balance     Decimal  @db.Decimal(15, 2) @default(0) // CrÃƒÂ©ditos/Cashback disponÃƒÂ­veis
+  
+  tenantId    String   @unique
+  tenant      Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model TransactionLedger {
+  id          String   @id @default(uuid())
+  description String
+  amount      Decimal  @db.Decimal(15, 2)
+  type        TransactionType // INCOME (Cashback ganho), EXPENSE (Cashback usado)
+  
+  tenantId    String
+  tenant      Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  createdAt   DateTime @default(now())
+
+  @@index([tenantId])
+}
+
+// --- GASTRO HUB MODULE: BARES & RESTAURANTES ---
+
+enum TableStatus {
+  FREE
+  OCCUPIED
+  RESERVED
+  NEEDS_CLEANING
+}
+
+model RestaurantTable {
+  id          String      @id @default(uuid())
+  number      Int
+  status      TableStatus @default(FREE)
+  seats       Int         @default(4)
+  
+  tenantId    String
+  tenant      Tenant      @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  comandas    Comanda[]
+
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  @@unique([tenantId, number])
+  @@index([tenantId])
+}
+
+enum ComandaStatus {
+  OPEN
+  PAID
+  CANCELED
+}
+
+model Comanda {
+  id          String        @id @default(uuid())
+  total       Decimal       @db.Decimal(15, 2) @default(0)
+  status      ComandaStatus @default(OPEN)
+  
+  tableId     String?
+  table       RestaurantTable? @relation(fields: [tableId], references: [id])
+
+  tenantId    String
+  tenant      Tenant        @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  @@index([tenantId])
+  @@index([tableId])
+}
+
+// --- INFOHUB MODULE: INFOPRODUTOS & EDTECH ---
+
+model Infoproduct {
+  id              String   @id @default(uuid())
+  title           String
+  description     String?
+  price           Decimal  @db.Decimal(15, 2) @default(0)
+  
+  // JSON Amorfo para a estrutura de MÃƒÂ³dulos, Aulas e Quizzes
+  contentLibrary  Json     @default("{}") 
+  
+  tenantId        String
+  tenant          Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  enrollments     Enrollment[]
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([tenantId])
+}
+
+model Enrollment {
+  id              String   @id @default(uuid())
+  
+  // Controle de Acesso Tokenizado
+  accessExpiry    DateTime? 
+  status          String    @default("ACTIVE") // ACTIVE, EXPIRED, REVOKED
+  progress        Json      @default("{}") // Telemetria de consumo (vÃƒÂ­deos assistidos, etc)
+
+  infoproductId   String
+  infoproduct     Infoproduct @relation(fields: [infoproductId], references: [id], onDelete: Cascade)
+
+  tenantId        String
+  tenant          Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  
+  // O aluno (Client/User) que comprou
+  studentEmail    String
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([infoproductId])
+  @@index([tenantId])
+}
+
+// --- NORTE PERFORMANCE HUB: WELLNESS & PRODUCTIVITY ---
+
+model TaskBoard {
+  id          String   @id @default(uuid())
+  title       String
+  description String?
+  status      String   @default("TODO") // TODO, IN_PROGRESS, DONE
+  
+  // GamificaÃƒÂ§ÃƒÂ£o: Quantos crÃƒÂ©ditos/cashback vale essa tarefa?
+  rewardPoints Decimal @db.Decimal(10, 2) @default(0)
+  
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  tenantId    String
+  tenant      Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([userId])
+  @@index([tenantId])
+}
+
+model PhysicalRoutine {
+  id          String   @id @default(uuid())
+  title       String   // "Treino de ForÃƒÂ§a", "Isometria", "Preventivo"
+  type        String   // "PPL", "FULL_BODY", "RECOVERY"
+  
+  // JSON amorfo para exercÃƒÂ­cios e sÃƒÂ©ries do Morphic Engine
+  exercises   Json     @default("[]") 
+  
+  // Telemetria de Wearables
+  avgHeartRate Int?
+  stepsCount   Int?
+  caloriesBurn Int?
+
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  tenantId    String
+  tenant      Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([userId])
+  @@index([tenantId])
+}
+
+model NutritionLog {
+  id          String   @id @default(uuid())
+  mealName    String
+  macros      Json     @default("{}") // { protein: 50, carbs: 100, fat: 20 }
+  
+  // Cross-SaaS: SugestÃƒÂ£o ou Consumo do Gastro Hub / Marketplace
+  source      String?  // "NORTE_RESTAURANT", "NORTE_STORE"
+  
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  tenantId    String
+  tenant      Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([userId])
+  @@index([tenantId])
+}
+
+// --- SOCIAL GRAPH & IDENTITY HUB ---
+
+model Profile {
+  id          String   @id @default(uuid())
+  bio         String?
+  avatarUrl   String?
+  
+  // NÃƒÂ­vel de GamificaÃƒÂ§ÃƒÂ£o Social
+  reputation  Int      @default(0) 
+
+  userId      String   @unique
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Connection {
+  id          String   @id @default(uuid())
+  status      String   @default("PENDING") // PENDING, ACCEPTED, BLOCKED
+  
+  initiatorId String
+  initiator   User     @relation("Initiator", fields: [initiatorId], references: [id], onDelete: Cascade)
+
+  receiverId  String
+  receiver    User     @relation("Receiver", fields: [receiverId], references: [id], onDelete: Cascade)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([initiatorId, receiverId])
+}
+
+model SocialEvent {
+  id          String   @id @default(uuid())
+  type        String   // "WORKOUT_COMPLETED", "SALE_MADE", "COURSE_FINISHED"
+  content     String   // Ex: "Bateu recorde no Supino Inclinado"
+  metadata    Json     @default("{}") // Dados amorfos do evento
+
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  tenantId    String
+  tenant      Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  createdAt   DateTime @default(now())
+
+  @@index([userId])
+  @@index([tenantId])
+}
+
+// --- GLOBAL REBRANDING & CONFIG ---
+
+model SystemConfig {
+  id          String   @id @default(uuid())
+  key         String   @unique // ex: "BRAND_NAME", "PRIMARY_COLOR", "GLOBAL_LOGO"
+  value       String   
+  
+  updatedAt   DateTime @updatedAt
+}
+
+// --- SMM HUB: SOCIAL & ADS MANAGER ---
+
+model SocialAccount {
+  id          String   @id @default(uuid())
+  platform    String   // "META", "GOOGLE", "TIKTOK"
+  accountId   String   // ID da conta de anÃƒÂºncios ou pÃƒÂ¡gina
+  name        String
+  accessToken String?  // Token de acesso da API
+
+  tenantId    String
+  tenant      Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  posts       PostSchedule[]
+  metrics     SocialMetric[]
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([tenantId])
+}
+
+model PostSchedule {
+  id              String   @id @default(uuid())
+  content         String
+  mediaUrls       String[]
+  scheduledFor    DateTime
+  status          String   @default("PENDING") // PENDING, PUBLISHED, FAILED
+
+  socialAccountId String
+  socialAccount   SocialAccount @relation(fields: [socialAccountId], references: [id], onDelete: Cascade)
+
+  tenantId        String
+  tenant          Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([socialAccountId])
+  @@index([tenantId])
+}
+
+model SocialMetric {
+  id              String   @id @default(uuid())
+  date            DateTime
+  
+  // MÃƒÂ©tricas OrgÃƒÂ¢nicas
+  likes           Int      @default(0)
+  shares          Int      @default(0)
+  comments        Int      @default(0)
+  
+  // MÃƒÂ©tricas de TrÃƒÂ¡fego Pago (Ads Orchestrator)
+  adSpend         Decimal  @db.Decimal(10, 2) @default(0)
+  cpl             Decimal  @db.Decimal(10, 2) @default(0) // Custo por Lead
+  conversionClicks Int     @default(0)
+  
+  socialAccountId String
+  socialAccount   SocialAccount @relation(fields: [socialAccountId], references: [id], onDelete: Cascade)
+
+  tenantId        String
+  tenant          Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([socialAccountId])
+  @@index([tenantId])
+}
+
+// --- CORTEX NEURAL: CONTEXT & META-LEARNING ENGINE ---
+
+model AIContext {
+  id          String   @id @default(uuid())
+  category    String   // "DIET_PREFERENCE", "WORKOUT_PATTERN", "BUSINESS_INSIGHT"
+  content     String   // O sumÃƒÂ¡rio do insight (ex: "Gosta de treinar perna ÃƒÂ s terÃƒÂ§as")
+  vector      Json?    // Estrutura para receber embeddings vetorizados
+  
+  userId      String?
+  user        User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  tenantId    String
+  tenant      Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([tenantId])
+  @@index([userId])
+}
+
+model AISkill {
+  id          String   @id @default(uuid())
+  name        String   // "Analista de Folha", "Estrategista de Ads"
+  description String
+  rules       Json     @default("{}") // Regras e prompts base para o agente carregar
+  isActive    Boolean  @default(true)
+
+  tenantId    String
+  tenant      Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([tenantId])
+}
+
+model UserRoadmap {
+  id          String   @id @default(uuid())
+  title       String   // "Meta Q3: Dobrar Faturamento" ou "Shape 90 Dias"
+  milestones  Json     @default("[]") // Checkpoints que a I.A. vai cobrar do usuÃƒÂ¡rio
+  status      String   @default("ACTIVE") // ACTIVE, COMPLETED, PAUSED
+
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  tenantId    String
+  tenant      Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([userId])
+  @@index([tenantId])
+}
+
+// --- SAAS MAKER: O LABORATÃƒâ€œRIO DE UNICÃƒâ€œRNIOS ---
+
+model ProjectTemplate {
+  id          String   @id @default(uuid())
+  name        String   // "ERP ClÃƒÂ­nica", "E-commerce Dark"
+  category    String
+  layoutBase  Json     // O layout base do Morphic Engine
+  price       Decimal  @db.Decimal(10, 2) @default(0) // Valor no Marketplace de SaaS
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model UserProject {
+  id          String   @id @default(uuid())
+  name        String
+  slug        String   @unique
+  morphicData Json     @default("{}") // Coordenadas e blocos do Norte Studio
+  theme       Json     @default("{}") // Cores e tipografia (Soberania de UI)
+  isPublished Boolean  @default(false)
+  
+  // O isolamento final acontecerÃƒÂ¡ criando um novo Tenant,
+  // mas aqui vinculamos quem criou (o dono do projeto).
+  tenantId    String
+  tenant      Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  domains     ProjectDomain[]
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([tenantId])
+}
+
+model ProjectDomain {
+  id          String   @id @default(uuid())
+  domain      String   @unique // ex: "meusaas.axis.com" ou "meusaas.com.br"
+  isCustom    Boolean  @default(false)
+  status      String   @default("PENDING") // PENDING, ACTIVE, ERROR
+
+  projectId   String
+  project     UserProject @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([projectId])
+}
+
+// --- TENTÃCULO 17: ELO DE AFINIDADE (SOCIAL & DMs) ---
+
+model Story {
+  id          String   @id @default(uuid())
+  contentUrl  String
+  type        String   @default("IMAGE") // IMAGE, VIDEO, MILESTONE_CARD
+  expiresAt   DateTime
+
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  tenantId    String
+  tenant      Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  createdAt   DateTime @default(now())
+
+  @@index([userId])
+  @@index([tenantId])
+}
+
+model DirectMessage {
+  id          String   @id @default(uuid())
+  content     String
+  isCard      Boolean  @default(false)
+  cardData    Json?    // Ex: { type: 'PRODUCT', id: '123' }
+
+  senderId    String
+  sender      User     @relation("SentMessages", fields: [senderId], references: [id], onDelete: Cascade)
+
+  receiverId  String
+  receiver    User     @relation("ReceivedMessages", fields: [receiverId], references: [id], onDelete: Cascade)
+
+  tenantId    String
+  tenant      Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  createdAt   DateTime @default(now())
+
+  @@index([senderId])
+  @@index([receiverId])
+}
+
+model AffinityMatch {
+  id          String   @id @default(uuid())
+  score       Int      @default(0) // 0 a 100
+  reasons     String[] // Ex: ['Mesma Academia', 'Estudantes PUC', 'SaaS Makers']
+  status      String   @default("SUGGESTED") // SUGGESTED, ACCEPTED, REJECTED
+
+  userAId     String
+  userA       User     @relation("MatchesA", fields: [userAId], references: [id], onDelete: Cascade)
+
+  userBId     String
+  userB       User     @relation("MatchesB", fields: [userBId], references: [id], onDelete: Cascade)
+
+  createdAt   DateTime @default(now())
+
+  @@unique([userAId, userBId])
+}
+
+
+
+
+
+
+// --- TENTÁCULO 18: ESTÚDIO MUTANTE (AV PRODUCTION) ---
+
+model MediaAsset {
+  id          String   @id @default(uuid())
+  name        String
+  url         String
+  type        String   // AUDIO_SAMPLE, BEAT, VIDEO_CLIP
+  genre       String?  // Funk, Trap, Boombap
+  bpm         Int?
+  key         String?  // Ex: C min, G# maj
+  duration    Float?
+
+  tenantId    String
+  tenant      Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([tenantId])
+}
+
+model AudioProject {
+  id          String   @id @default(uuid())
+  title       String
+  stems       Json     @default("[]") // Tracks separadas via AI Splitter
+  status      String   @default("DRAFT")
+
+  tenantId    String
+  tenant      Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([tenantId])
+}
+
+model VideoDraft {
+  id          String   @id @default(uuid())
+  title       String
+  videoUrl    String?
+  promptUsed  String?  // Prompt que gerou o video (Veo Engine)
+  status      String   @default("PROCESSING")
+
+  tenantId    String
+  tenant      Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([tenantId])
+}

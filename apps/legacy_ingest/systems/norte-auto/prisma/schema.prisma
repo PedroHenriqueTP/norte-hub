@@ -1,0 +1,164 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  password      String?
+  plan          String    @default("free") // free, pro, enterprise
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  accounts      Account[]
+  sessions      Session[]
+
+  // Stripe / Billing Fields
+  stripeCustomerId       String?   @unique
+  stripeSubscriptionId   String?   @unique
+  stripePriceId          String?
+  subscriptionStatus     String?   // active, past_due, canceled, trialing
+  subscriptionEndDate    DateTime?
+  
+  // Billing Preferences
+  billingPreference      String    @default("lowest_fee") // lowest_fee, fastest_payout, default
+
+  // AI Usage Tracking
+  aiUsageCount           Int       @default(0)
+  aiLastReset            DateTime  @default(now())
+
+  // Geo-Adaptive / Localization
+  region                 String    @default("BR") // BR, US, EU, etc.
+  isCrossBorder          Boolean   @default(false)
+
+  products          Product[]
+  orders            Order[]
+  integrationConfig IntegrationConfig[]
+  
+  // Notifications
+  notifications         Notification[]
+  notificationSettings  NotificationSettings?
+}
+
+model Account {
+  id                 String  @id @default(cuid())
+  userId             String
+  type               String
+  provider           String
+  providerAccountId  String
+  refresh_token      String?
+  access_token       String?
+  expires_at         Int?
+  token_type         String?
+  scope              String?
+  id_token           String?
+  session_state      String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model Product {
+  id          String   @id @default(cuid())
+  sku         String?
+  name        String
+  description String?
+  price       Decimal
+  stock       Int      @default(0)
+  images      String?  // JSON string or comma-separated URLs
+  
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@index([userId])
+}
+
+model Order {
+  id          String   @id @default(cuid())
+  orderId     String   // External Order ID
+  platform    String   // MercadoLivre, Shopee, etc.
+  total       Decimal
+  status      String
+  customer    String?
+  
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([userId])
+}
+
+model IntegrationConfig {
+  id        String   @id @default(cuid())
+  platform  String   // MercadoLivre, Shopee, Amazon
+  
+  // Encrypted credentials
+  apiKey    String?
+  apiSecret String?
+  accessToken String?
+  refreshToken String?
+  
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, platform])
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  title     String
+  message   String
+  type      String   // SALE, LOW_STOCK, SYSTEM, etc.
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@index([userId])
+}
+
+model NotificationSettings {
+    id String @id @default(cuid())
+    userId String @unique
+    
+    emailSales     Boolean @default(true)
+    pushSales      Boolean @default(false)
+    emailLowStock  Boolean @default(true)
+    pushLowStock   Boolean @default(true)
+    emailSecurity  Boolean @default(true) // e.g., token expiry
+    
+    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}

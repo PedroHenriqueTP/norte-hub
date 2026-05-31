@@ -17,6 +17,7 @@ model Tenant {
   features  TenantFeature[]
   products  DigitalProduct[]
   oauthVaults OAuthVault[]
+  bookshelfLicenses BookshelfLicense[]
 }
 
 enum PlanTier {
@@ -65,4 +66,35 @@ model OAuthVault {
   tenant       Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
+}
+
+
+model BookshelfProduct {
+  id           String             @id @default(uuid())
+  solutionKey  String             @unique
+  name         String
+  description  String
+  baseMonthly  Decimal
+  createdAt    DateTime           @default(now())
+  licenses     BookshelfLicense[]
+}
+
+model BookshelfLicense {
+  id          String           @id @default(uuid())
+  tenantId    String
+  tenant      Tenant           @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  productId   String
+  product     BookshelfProduct @relation(fields: [productId], references: [id], onDelete: Cascade)
+  status      LicenseStatus    @default(ACTIVE)
+  configVault Json
+  activatedAt DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  @@unique([tenantId, productId])
+}
+
+enum LicenseStatus {
+  ACTIVE
+  SUSPENDED
+  MAINTENANCE
 }
