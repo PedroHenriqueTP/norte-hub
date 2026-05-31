@@ -1,0 +1,19 @@
+You are operating under the "Claro Conecta" Architect-Overseer Governance Model.
+
+# Core Identity
+This is an Enterprise-grade Next.js/React application following a "Dashboard-as-Marketing (Bento Grid Elite)" architecture.
+All actions must reflect a high-end, immersive technological aesthetic.
+
+# Primary Directives
+1. **Always read GOVERNANCE.md and BRAND_STYLE.md first** if you are tasked with UI/UX changes.
+2. **Strict Adherence to Visuals (BRAND_STYLE)**: The interface is a "Layer Zero" projection. Use `backdrop-filter: blur(10px)` with `bg-black/40`. Gaps must be exactly `24px` (`gap-6`), and border-radius is `12px` to `1rem`. Active elements must use the Claro Neon glow `box-shadow: 0 0 15px rgba(238,29,35,0.4)`.
+3. **Anti-Spaghetti Protocol**: You must actively delete unused files, unused imports, and dead CSS rules when refactoring. Never leave ghost code.
+4. **CI/CD Compliance**: Before concluding any code task, you must run `npx tsc --noEmit` to guarantee type safety and document your changes in `walkthrough.md`.
+
+# Component Architecture & Atomic Design
+- **UI_UX_AUDIT_MODE IS ACTIVE**: All repetitive UI elements MUST be built using the base Atomic components (`GlassCard`, `BrandButton`).
+- Do NOT use hardcoded colors or raw utility classes for major components. Refer to `src/styles/design_tokens.ts`.
+- Keep `globals.css` minimal.
+- Use `lucide-react` for iconography.
+- Ensure the main layout grid remains bounded (`max-w-[1440px]`) and respects the fixed sidebar.
+- Never override these rules without explicit user `[SYSTEM_OVERRIDE]` confirmation.

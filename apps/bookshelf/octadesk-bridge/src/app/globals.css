@@ -1,0 +1,129 @@
+@import url('https://fonts.googleapis.com/css2?family=Urbanist:wght@300;400;600;800;900&display=swap');
+@import "tailwindcss";
+
+:root {
+  --background-from: #F8FAFC;
+  --background-to: #E2E8F0;
+  --foreground: #2C3647;
+  --octa-blue: #2C3647;
+  --octa-dark: #2C3647;
+  --cyber-blue: #2C3647;
+  --cyber-cyan: #00E5FF;
+  --panel-bg: rgba(255, 255, 255, 0.96);
+  --panel-border: rgba(44, 54, 71, 0.1);
+  --accent-glow: rgba(0, 229, 255, 0.2);
+  --card-hover-border: rgba(44, 54, 71, 0.25);
+  --bg-grid-color: rgba(44, 54, 71, 0.015);
+}
+
+@theme inline {
+  --color-bg-from: var(--background-from);
+  --color-bg-to: var(--background-to);
+  --color-foreground: var(--foreground);
+  --color-octa-blue: var(--octa-blue);
+  --color-octa-dark: var(--octa-dark);
+  --color-cyber-blue: var(--cyber-blue);
+  --color-cyber-cyan: var(--cyber-cyan);
+  --color-panel-bg: var(--panel-bg);
+  --color-panel-border: var(--panel-border);
+}
+
+body, html {
+  background: #FFFFFF;
+  color: #2C3647; /* Cor principal oficial */
+  font-family: 'Outfit', 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  overflow-x: hidden;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+.glow-cyan {
+  box-shadow: 0 0 20px rgba(0, 229, 255, 0.2);
+}
+
+.glow-text-cyan {
+  text-shadow: 0 0 8px rgba(0, 229, 255, 0.2);
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--background-to);
+}
+::-webkit-scrollbar-thumb {
+  background: #2C3647;
+  border-radius: 4px;
+}
+
+@keyframes pulse-slow {
+  0%, 100% {
+    opacity: 0.3;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(1.02);
+  }
+}
+
+.animate-pulse-slow {
+  animation: pulse-slow 4s infinite ease-in-out;
+}
+
+/* Configuração de Variáveis de Cor Globais */
+:root {
+  --bg-primary: #F8FAFC;
+  --bg-deep: #2C3647; /* Azul Profundo / Dark Slate oficial */
+  --cyan-neon: #00E5FF;
+  --navy-official: #2C3647;
+}
+
+/* Grid de Soluções com Múltipla Escolha - Otimizado para Tablet Touch */
+.grid-canais {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+  padding: 12px;
+}
+
+.card-solucao {
+  border: 2px solid #E2E8F0;
+  border-radius: 20px;
+  padding: 28px;
+  background: #FFFFFF;
+  cursor: pointer;
+  transition: all 0.25s ease-in-out;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 140px;
+  touch-action: manipulation;
+}
+
+.card-solucao:hover {
+  border-color: #CBD5E1;
+  transform: translateY(-2px);
+}
+
+.card-solucao:active {
+  transform: scale(0.98);
+}
+
+.card-solucao.selected {
+  border-color: #2C3647;
+  box-shadow: 0 0 20px rgba(44, 54, 71, 0.15);
+  background: #F8FAFC;
+}
+
+/* Tablet-First Ergonomics Adjustments */
+input, button, select, textarea, [role="button"], .card-solucao, .octo-container {
+  touch-action: manipulation;
+}
+
+/* Enable vertical scroll only if viewport is too small, prevent overflow bounce on touch */
+body:not(.admin-panel-root) {
+  overflow-y: auto;
+  min-height: 100vh;
+}

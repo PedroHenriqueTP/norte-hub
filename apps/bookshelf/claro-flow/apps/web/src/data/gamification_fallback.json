@@ -1,0 +1,205 @@
+{
+  "events": [
+    {
+      "id": "f1-interlagos",
+      "name": "GP F1 Interlagos",
+      "date": "2026-05-26T19:00:20.213Z"
+    },
+    {
+      "id": "bienal-livro",
+      "name": "Bienal do Livro",
+      "date": "2026-05-26T19:00:20.214Z"
+    },
+    {
+      "id": "sp-open",
+      "name": "SP Open Tênis",
+      "date": "2026-05-28T01:10:59.793Z"
+    }
+  ],
+  "userEvents": [
+    {
+      "id": "pyn1ewzbv-xerl0yn7j",
+      "eventId": "f1-interlagos",
+      "name": "pedrp",
+      "email": "pedrotozzipazin@gmail.com",
+      "qrCodeToken": "VBU8LO",
+      "totalPoints": 50
+    },
+    {
+      "id": "c7fepgpy5-9hazieerg",
+      "eventId": "bienal-livro",
+      "name": "Pedro Henrique Pazin",
+      "email": "pedrotozzipazin@gmail.com",
+      "qrCodeToken": "088GCC",
+      "totalPoints": 30
+    }
+  ],
+  "activations": [
+    {
+      "id": "f1-simulador",
+      "eventId": "f1-interlagos",
+      "name": "Simulador F1 5G",
+      "pointsGiven": 50,
+      "cooldownMin": 5
+    },
+    {
+      "id": "f1-gaming",
+      "eventId": "f1-interlagos",
+      "name": "Arena Gaming Claro net virtua",
+      "pointsGiven": 30,
+      "cooldownMin": 5
+    },
+    {
+      "id": "f1-hub",
+      "eventId": "f1-interlagos",
+      "name": "Hub de Inovação 5G",
+      "pointsGiven": 20,
+      "cooldownMin": 5
+    },
+    {
+      "id": "bienal-arena",
+      "eventId": "bienal-livro",
+      "name": "Arena Cultural Claro tv+",
+      "pointsGiven": 40,
+      "cooldownMin": 5
+    },
+    {
+      "id": "bienal-skeelo",
+      "eventId": "bienal-livro",
+      "name": "Passaporte de Leitura Skeelo",
+      "pointsGiven": 30,
+      "cooldownMin": 5
+    },
+    {
+      "id": "bienal-tiktok",
+      "eventId": "bienal-livro",
+      "name": "Espaço TikToker Claro 5G",
+      "pointsGiven": 30,
+      "cooldownMin": 5
+    },
+    {
+      "id": "f1-instagram",
+      "eventId": "f1-interlagos",
+      "name": "Concurso Insta Claro F1",
+      "pointsGiven": 50,
+      "cooldownMin": 5
+    },
+    {
+      "id": "bienal-instagram",
+      "eventId": "bienal-livro",
+      "name": "Concurso Insta Claro Bienal",
+      "pointsGiven": 50,
+      "cooldownMin": 5
+    },
+    {
+      "id": "sp-simulador",
+      "eventId": "sp-open",
+      "name": "Simulador de Saque 5G",
+      "pointsGiven": 40,
+      "cooldownMin": 5
+    },
+    {
+      "id": "sp-virtual",
+      "eventId": "sp-open",
+      "name": "VR Tennis Challenge",
+      "pointsGiven": 30,
+      "cooldownMin": 5
+    },
+    {
+      "id": "sp-autografos",
+      "eventId": "sp-open",
+      "name": "Espaço Autógrafos Atletas",
+      "pointsGiven": 20,
+      "cooldownMin": 5
+    },
+    {
+      "id": "sp-instagram",
+      "eventId": "sp-open",
+      "name": "Concurso Insta Claro SP Open",
+      "pointsGiven": 50,
+      "cooldownMin": 5
+    }
+  ],
+  "pointLogs": [
+    {
+      "id": "nzwldcmms",
+      "userEventId": "c7fepgpy5-9hazieerg",
+      "activationId": "bienal-skeelo",
+      "pointsEarned": 30,
+      "createdAt": "2026-05-28T07:14:13.647Z"
+    },
+    {
+      "id": "b9erm9ry1",
+      "userEventId": "pyn1ewzbv-xerl0yn7j",
+      "activationId": "f1-simulador",
+      "pointsEarned": 50,
+      "createdAt": "2026-05-28T07:42:32.864Z"
+    }
+  ],
+  "gifts": [
+    {
+      "id": "f1-gift-bone",
+      "eventId": "f1-interlagos",
+      "name": "Boné Oficial Red Bull Racing Claro",
+      "pointsCost": 80,
+      "stock": 5
+    },
+    {
+      "id": "f1-gift-copo",
+      "eventId": "f1-interlagos",
+      "name": "Copo Térmico Claro F1",
+      "pointsCost": 50,
+      "stock": 20
+    },
+    {
+      "id": "f1-gift-squeeze",
+      "eventId": "f1-interlagos",
+      "name": "Squeeze Térmica Claro",
+      "pointsCost": 30,
+      "stock": 50
+    },
+    {
+      "id": "bienal-gift-tv",
+      "eventId": "bienal-livro",
+      "name": "Assinatura Claro tv+ (3 meses)",
+      "pointsCost": 70,
+      "stock": 10
+    },
+    {
+      "id": "bienal-gift-ecobag",
+      "eventId": "bienal-livro",
+      "name": "Ecobag Exclusiva Claro Bienal",
+      "pointsCost": 40,
+      "stock": 30
+    },
+    {
+      "id": "bienal-gift-adesivo",
+      "eventId": "bienal-livro",
+      "name": "Adesivo Oficial Claro & Multi",
+      "pointsCost": 20,
+      "stock": 100
+    },
+    {
+      "id": "sp-gift-bolas",
+      "eventId": "sp-open",
+      "name": "Tubo de Bolas de Tênis Claro",
+      "pointsCost": 70,
+      "stock": 15
+    },
+    {
+      "id": "sp-gift-viseira",
+      "eventId": "sp-open",
+      "name": "Viseira Esportiva Claro Open",
+      "pointsCost": 40,
+      "stock": 25
+    },
+    {
+      "id": "sp-gift-squeeze",
+      "eventId": "sp-open",
+      "name": "Squeeze Metálico Claro Open",
+      "pointsCost": 30,
+      "stock": 40
+    }
+  ],
+  "redemptions": []
+}

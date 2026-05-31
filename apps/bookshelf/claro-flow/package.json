@@ -1,0 +1,28 @@
+{
+  "name": "claro-conecta-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "packageManager": "npm@10.8.2",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "db:generate": "turbo run db:generate",
+    "db:push": "turbo run db:push",
+    "overseer:start": "ts-node scripts/workflow_overseer.ts"
+  },
+  "dependencies": {
+    "node-notifier": "^10.0.1"
+  },
+  "devDependencies": {
+    "turbo": "^2.3.3",
+    "typescript": "^5.0.0",
+    "ts-node": "^10.9.2",
+    "@types/node": "^20.0.0",
+    "@types/node-notifier": "^8.0.5"
+  }
+}
