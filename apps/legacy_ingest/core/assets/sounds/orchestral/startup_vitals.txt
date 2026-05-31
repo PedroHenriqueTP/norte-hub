@@ -1,0 +1,1 @@
+﻿SOUND_PROFILE: Orchestral_Swell_C_Major | Gain: +3db | Reverb: Galactic_Hall

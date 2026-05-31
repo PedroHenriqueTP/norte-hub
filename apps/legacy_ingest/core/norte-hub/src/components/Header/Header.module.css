@@ -1,0 +1,46 @@
+.header {
+    position: sticky;
+    top: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 2rem;
+    height: var(--header-height);
+    border-bottom: var(--border-width) solid var(--border-color);
+    background-color: var(--bg-color);
+    /* Solid background for brutalist feel */
+    z-index: 100;
+    text-transform: uppercase;
+}
+
+.logo {
+    font-family: 'Oswald', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    background-color: var(--text-color);
+    color: var(--bg-color);
+    padding: 5px 10px;
+}
+
+.nav {
+    display: flex;
+    gap: 1px;
+    /* Separation for border look */
+    background-color: var(--border-color);
+    /* Create gaps with border color */
+    border: var(--border-width) solid var(--border-color);
+}
+
+.navLink {
+    padding: 10px 20px;
+    background-color: var(--bg-color);
+    font-weight: 700;
+    transition: all 0.2s;
+    font-family: 'JetBrains Mono', monospace;
+}
+
+.navLink:hover {
+    background-color: var(--neon-pink);
+    color: var(--bg-color);
+}

@@ -1,0 +1,61 @@
+import { Product } from '@/types';
+
+export const products: Product[] = [
+    {
+        id: '1',
+        title: 'Cesto de Palha Natural',
+        shortDescription: 'Cesto organizador feito à mão com fibras naturais.',
+        price: 89.90,
+        category: 'Casa',
+        imageUrl: 'https://images.unsplash.com/photo-1616486338812-3dadae4b4f9d?q=80&w=2070&auto=format&fit=crop',
+        inStock: true,
+        isFeatured: true,
+    },
+    {
+        id: '2',
+        title: 'Camisa de Linho Orgânico',
+        shortDescription: 'Conforto e elegância com tecido 100% natural.',
+        price: 159.00,
+        category: 'Roupas',
+        imageUrl: 'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?q=80&w=1888&auto=format&fit=crop',
+        inStock: true,
+        isFeatured: true,
+    },
+    {
+        id: '3',
+        title: 'Kit Utensílios de Bambu',
+        shortDescription: 'Durabilidade e sustentabilidade para sua cozinha.',
+        price: 45.50,
+        category: 'Utilitários',
+        imageUrl: 'https://images.unsplash.com/photo-1584269600464-37b1b58a9fe7?q=80&w=2071&auto=format&fit=crop',
+        inStock: true,
+    },
+    {
+        id: '4',
+        title: 'Vela Aromática de Soja',
+        shortDescription: 'Aroma suave de lavanda para relaxamento.',
+        price: 35.00,
+        category: 'Naturais',
+        imageUrl: 'https://images.unsplash.com/photo-1602143407151-0111419500be?q=80&w=1974&auto=format&fit=crop',
+        inStock: true,
+    },
+    {
+        id: '5',
+        title: 'Vaso de Cerâmica Artesanal',
+        shortDescription: 'Design minimalista e toque rústico.',
+        price: 78.00,
+        category: 'Casa',
+        imageUrl: 'https://images.unsplash.com/photo-1612196808214-b7e239e5f6b7?q=80&w=1887&auto=format&fit=crop',
+        inStock: true,
+        isFeatured: true,
+    },
+    {
+        id: '6',
+        title: 'Sabonete Natural de Aveia',
+        shortDescription: 'Hidratação profunda sem químicos agressivos.',
+        price: 12.90,
+        category: 'Naturais',
+        imageUrl: 'https://images.unsplash.com/photo-1600857062241-98e5dba7f214?q=80&w=1998&auto=format&fit=crop',
+        inStock: true,
+    }
+];

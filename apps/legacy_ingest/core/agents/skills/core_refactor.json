@@ -1,0 +1,11 @@
+﻿{
+  "skill_name": "Norte_Sanity_Check",
+  "version": "1.0.0",
+  "triggers": ["convulsion", "error_500", "high_cpu"],
+  "actions": {
+    "clear_cache": "rm -rf .next",
+    "kill_node": "stop-process -name node",
+    "rebuild": "npm run dev"
+  },
+  "feedback_loop": "Log entry in Obsidian_Vault/Log_da_IA"
+}

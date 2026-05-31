@@ -1,0 +1,120 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+
+// Usuários (clientes e admin)
+model User {
+  id            String    @id @default(cuid())
+  name          String
+  email         String    @unique
+  phone         String?
+  password      String
+  role          UserRole  @default(CLIENT)
+  emailVerified DateTime?
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  
+  // Relações
+  reviews       Review[]
+  
+  @@index([email])
+  @@index([role])
+}
+
+enum UserRole {
+  CLIENT
+  ADMIN
+}
+
+// Projetos do portfólio
+model Project {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  category    String
+  images      String   // JSON string of URLs
+  featured    Boolean  @default(false)
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@index([featured, order])
+  @@index([category])
+}
+
+// Avaliações e comentários
+model Review {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  rating      Int      // 1-5
+  comment     String
+  approved    Boolean  @default(false)
+  googleLink  String?  // Link para avaliação no Google
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@index([approved, createdAt])
+  @@index([userId])
+}
+
+// Formulários de contato (antes do cadastro ou de visitantes)
+model ContactForm {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  phone     String
+  message   String
+  status    String   @default("new") // new, contacted, converted
+  createdAt DateTime @default(now())
+  
+  @@index([status, createdAt])
+}
+
+// Agendamentos (apenas admin cria/gerencia)
+model Appointment {
+  id          String            @id @default(cuid())
+  clientName  String
+  clientEmail String
+  clientPhone String
+  title       String
+  description String?
+  date        DateTime
+  address     String
+  status      AppointmentStatus @default(PENDING)
+  googleEventId String?         // ID do evento no Google Calendar
+  notes       String?
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  
+  @@index([status, date])
+  @@index([clientEmail])
+}
+
+enum AppointmentStatus {
+  PENDING
+  CONFIRMED
+  COMPLETED
+  CANCELLED
+}
+
+// Métricas para o dashboard admin
+model Analytics {
+  id            String   @id @default(cuid())
+  date          DateTime @unique @default(now())
+  pageViews     Int      @default(0)
+  uniqueVisitors Int     @default(0)
+  contactForms  Int      @default(0)
+  newClients    Int      @default(0)
+  
+  @@index([date])
+}

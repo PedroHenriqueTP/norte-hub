@@ -1,0 +1,36 @@
+.gridContainer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, 50px);
+    grid-auto-rows: 50px;
+    z-index: -1;
+    /* Behind everything */
+    overflow: hidden;
+    background-color: var(--bg-color);
+}
+
+.block {
+    width: 100%;
+    height: 100%;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    /* Very subtle grid lines */
+    transition: background-color 0s, border-color 0s;
+}
+
+.block:hover {
+    background-color: var(--neon-green);
+    border-color: var(--neon-green);
+    box-shadow: 0 0 10px var(--neon-green);
+    transition-duration: 0s;
+    /* Instant reaction */
+    z-index: 1;
+}
+
+/* Add a fade out transition to leave a trail? */
+.block {
+    transition: background-color 0.5s ease;
+}

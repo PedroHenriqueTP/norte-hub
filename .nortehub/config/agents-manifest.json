@@ -1,0 +1,30 @@
+{
+  "agents": [
+    {
+      "id": "ui-architect",
+      "name": "UI Architect",
+      "primary_skill": "Interpretar mockups/imagens via visão computacional e converter em código Tailwind/Next.js limpo.",
+      "scope": [
+        "Monitorar componentes do frontend",
+        "Monitorar o File Pool analítico"
+      ]
+    },
+    {
+      "id": "sync-daemon",
+      "name": "Sync Daemon",
+      "primary_skill": "Consumir a API do Notion, purificar o JSON em Markdown limpo e sincronizar via Service Account com o Google Drive de forma assíncrona.",
+      "scope": [
+        "Automação local e em nuvem"
+      ]
+    },
+    {
+      "id": "nlp-router",
+      "name": "NLP Router",
+      "primary_skill": "Interceptar os inputs multimodais do chat web, catalogar insights com a tag [Origem: Gemini] e indexar caminhos de arquivos locais (#file).",
+      "scope": [
+        "Interceptação de chat web",
+        "Indexação de caminhos locais"
+      ]
+    }
+  ]
+}

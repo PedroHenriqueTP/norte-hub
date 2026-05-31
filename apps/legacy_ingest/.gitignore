@@ -1,0 +1,11 @@
+
+# Personal and Academic Files
+*.pdf
+*.docx
+*.doc
+*.jpg
+*.jpeg
+*.png
+atestados/
+puc-sp/
+node_modules

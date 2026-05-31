@@ -1,0 +1,54 @@
+Para transformar o seu bot numa plataforma SaaS (Software as a Service) profissional e vendável para várias clínicas, o checklist muda de nível. Agora, o foco não é apenas "fazer funcionar", mas sim gestão, segurança e isolamento de dados.
+
+Aqui está o checklist definitivo para a sua infraestrutura SaaS:
+
+1. Arquitetura Multi-Tenant & Backend (Escalabilidade)
+[ ] Roteamento por phone_number_id: Criar um middleware que identifica o cliente no banco de dados através do ID que a Meta envia no webhook.
+
+[ ] Isolamento de Dados (Schema ou Row-Level): Garantir que a Clínica A nunca aceda aos dados da Clínica B (essencial para conformidade com a LGPD).
+
+[ ] Gerenciador de Instâncias: Criar uma lógica no backend para carregar dinamicamente as credenciais da API da Meta (Tokens) de cada cliente.
+
+[ ] Rate Limiting: Implementar limites de requisições por cliente para evitar que um bot muito ativo derrube o servidor de todos.
+
+2. Infraestrutura Cloud (AWS & DevOps)
+[ ] AWS Elastic Beanstalk ou ECS (Docker): Para hospedar a aplicação Node.js com auto-scaling (o servidor cresce sozinho se houver muitas mensagens).
+
+[ ] AWS RDS (PostgreSQL): Banco de dados gerenciado com alta disponibilidade.
+
+[ ] Backups Automatizados: Configurar Snapshots diários no RDS com retenção de 7 a 30 dias.
+
+[ ] Redis (ElastiCache): Para gerir as sessões das conversas de todos os clientes com latência zero.
+
+[ ] Monitorização (CloudWatch): Alertas automáticos para o seu e-mail se o servidor atingir 80% de CPU.
+
+3. Integração com Google Calendar (Sincronização)
+[ ] Google Cloud Project (OAuth 2.0): Criar um projeto no Google Cloud para obter as credenciais da API.
+
+[ ] Fluxo de Autenticação para o Cliente: Criar um botão no seu Dashboard: "Conectar com Google Calendar", onde o dono da clínica autoriza o seu bot a escrever na agenda dele.
+
+[ ] Sincronização Bidirecional:
+
+Bot agenda → Escreve no Google.
+
+Médico apaga no Google → Webhook do Google avisa o seu bot para libertar o horário.
+
+[ ] Verificação de Disponibilidade: Antes do bot oferecer um horário, ele deve consultar a API do Google para ver se o médico já não marcou um compromisso pessoal.
+
+4. CRM e Dashboard (O Produto Vendável)
+[ ] Painel Administrativo (Frontend): Desenvolvido em React ou Next.js para os clientes fazerem login.
+
+[ ] Visualização de Agendamentos: Calendário interativo (estilo mensal/semanal) que puxa os dados do PostgreSQL.
+
+[ ] Gestão de Horários e Feriados: Interface para a clínica definir: "Atendemos de segunda a sexta, das 08h às 18h".
+
+[ ] Logs de Conversa: Área para o recepcionista ler o que o cliente escreveu para o bot antes da marcação.
+
+[ ] Controle de Pagamento (Billing): Integração com Stripe ou ASAAS para cobrar mensalidades e bloquear o acesso se o cliente não pagar.
+
+5. Segurança e Conformidade (LGPD)
+[ ] Criptografia em Repouso: Todos os tokens e dados de pacientes devem ser guardados criptografados no banco de dados.
+
+[ ] Termos de Uso e Política de Privacidade: Documentação jurídica clara sobre como os dados de saúde são tratados.
+
+[ ] Registo de Auditoria (Logs): Saber exatamente qual funcionário da clínica alterou ou eliminou um agendamento no Dashboard.

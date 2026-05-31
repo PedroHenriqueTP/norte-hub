@@ -1,0 +1,256 @@
+// Central Schema for Norte Global Hub
+// Logic: Mobility (Drive) & Logistics (Cargo) integration
+
+datasource db {
+  provider = "postgresql"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  role          UserRole  @default(CLIENT)
+
+  // Unified Professional Profile
+  professional ProfessionalProfile?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Module Relations
+  workouts      Workout[]
+  dietLogs      DietLog[]
+  clientServices ServiceCall[] @relation("ClientServices")
+  providerServices ServiceCall[] @relation("ProviderServices")
+}
+
+enum UserRole {
+  ADMIN
+  PARTNER
+  CLIENT
+  PROFESSIONAL
+}
+
+model ProfessionalProfile {
+  id      String @id @default(cuid())
+  userId  String @unique
+  user    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Documentations & Status
+  licenseNumber String?
+  vehicleType   String?
+  status        ProfessionalStatus @default(PENDING)
+
+  // Mobility Module (Norte Drive)
+  isDriver     Boolean @default(false)
+  driverRating Float?
+
+  // Logistics Module (Norte Cargo)
+  isCourier     Boolean @default(false)
+  courierRating Float?
+
+  // Shared Activities
+  moveTrips    MoveTrip[]
+  logisticsDeliveries LogisticsDelivery[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum ProfessionalStatus {
+  PENDING
+  ACTIVE
+  SUSPENDED
+  INACTIVE
+}
+
+model MoveTrip {
+  id             String   @id @default(cuid())
+  driverId       String
+  driver         ProfessionalProfile @relation(fields: [driverId], references: [id])
+  origin         String
+  destination    String
+  status         MoveStatus @default(REQUESTED)
+  startTime      DateTime?
+  endTime        DateTime?
+  price          Decimal
+}
+
+enum MoveStatus {
+  REQUESTED
+  ACCEPTED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+model LogisticsDelivery {
+  id             String   @id @default(cuid())
+  courierId      String
+  courier        ProfessionalProfile @relation(fields: [courierId], references: [id])
+  packageName    String
+  weight         Float?
+  status         LogisticsStatus @default(PENDING)
+  pickupPoint    String
+  deliveryPoint  String
+  price          Decimal
+}
+
+enum LogisticsStatus {
+  PENDING
+  PICKED_UP
+  IN_TRANSIT
+  DELIVERED
+  CANCELLED
+}
+
+// Health & Performance Module (Norte Fit)
+model Workout {
+  id             String   @id @default(cuid())
+  userId         String
+  user           User     @relation(fields: [userId], references: [id])
+  title          String
+  exercises      Json     // List of exercises, sets, reps
+  date           DateTime @default(now())
+  durationMinutes Int?
+  notes          String?
+}
+
+model DietLog {
+  id             String   @id @default(cuid())
+  userId         String
+  user           User     @relation(fields: [userId], references: [id])
+  date           DateTime @default(now())
+  meals          Json     // List of meals and macros
+  totalCalories  Int
+  protein        Float
+  carbs          Float
+  fats           Float
+}
+
+// Maintenance & Services Module (Norte Services)
+model ServiceCall {
+  id             String   @id @default(cuid())
+  clientId       String
+  client         User     @relation("ClientServices", fields: [clientId], references: [id])
+  providerId     String?
+  provider       User?    @relation("ProviderServices", fields: [providerId], references: [id])
+  serviceType    String   // e.g., Electrician, Plumber, IT
+  description    String
+  status         ServiceStatus @default(OPEN)
+  location       String
+  price          Decimal?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+enum ServiceStatus {
+  OPEN
+  ASSIGNED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+// Education Module (Norte Study)
+model EducationInstitution {
+  id        String          @id @default(cuid())
+  name      String
+  records   AcademicRecord[]
+  createdAt DateTime        @default(now())
+}
+
+model AcademicRecord {
+  id            String               @id @default(cuid())
+  studentName   String
+  institutionId String
+  grades        Json
+  semester      String?
+  institution   EducationInstitution @relation(fields: [institutionId], references: [id])
+  createdAt     DateTime             @default(now())
+}
+
+model StudyFile {
+  id        String   @id @default(cuid())
+  fileName  String
+  fileUrl   String
+  category  String   // pdf, notebook, script, slides
+  tags      String[]
+  createdAt DateTime @default(now())
+}
+
+// Task Management Module (Norte Systems - Delegamento)
+model Task {
+  id          String    @id @default(cuid())
+  title       String
+  description String?
+  status      TaskStatus @default(PENDING)
+  priority    Priority   @default(MEDIUM)
+  assignedTo  String?
+  staffId     String?
+  staff       Staff?     @relation(fields: [staffId], references: [id])
+  systemTag   String     // Clinic | Agency | Auto | Study | Fit
+  dueDate     DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+enum TaskStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+// Knowledge Graph (Norte Study - Rede Neural)
+model KnowledgeNode {
+  id        String          @id @default(cuid())
+  title     String
+  content   String?
+  category  String          // IA | DataScience | Dev | Fitness | Services
+  color     String          @default("#00F2FF")
+  tags      String[]
+  links     KnowledgeEdge[] @relation("SourceNode")
+  backlinks KnowledgeEdge[] @relation("TargetNode")
+  createdAt DateTime        @default(now())
+}
+
+model KnowledgeEdge {
+  id       String        @id @default(cuid())
+  sourceId String
+  targetId String
+  weight   Float         @default(1.0)
+  source   KnowledgeNode @relation("SourceNode", fields: [sourceId], references: [id])
+  target   KnowledgeNode @relation("TargetNode", fields: [targetId], references: [id])
+}
+
+model Staff {
+  id          String   @id @default(cuid())
+  name        String
+  role        String
+  system      String   // Clinic | Agency | Auto | Food
+  performance Float    // KPI de produtividade
+  tasks       Task[]
+}
+
+model Member {
+  id            String   @id @default(cuid())
+  name          String
+  tier          String   // BRONZE | EMERALD | OBSIDIAN
+  joinedAt      DateTime @default(now())
+  points        Int      @default(0)
+  benefits      Json     // Benefícios ativos nos subsistemas
+}

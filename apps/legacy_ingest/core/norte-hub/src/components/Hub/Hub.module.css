@@ -1,0 +1,65 @@
+.hub {
+    padding: 4rem 2rem;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border-bottom: var(--border-width) solid var(--border-color);
+    background: transparent;
+    /* Show interactive bg */
+}
+
+.sectionTitle {
+    font-size: 3rem;
+    margin-bottom: 3rem;
+    background: var(--bg-color);
+    padding: 0.5rem 1rem;
+    border: var(--border-width) solid var(--border-color);
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    width: 100%;
+    max-width: 1200px;
+}
+
+.card {
+    aspect-ratio: 1;
+    /* Square cards */
+    border: var(--border-width) solid var(--border-color);
+    background: var(--bg-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    transition: all 0.2s cubic-bezier(0.1, 0.7, 1.0, 0.1);
+    cursor: pointer;
+}
+
+.cardContent {
+    text-align: center;
+    z-index: 10;
+}
+
+.cardTitle {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+}
+
+.cardDesc {
+    color: var(--color-gray);
+    font-family: 'JetBrains Mono', monospace;
+}
+
+/* Hard Shadow / Pop Effect */
+.card:hover {
+    transform: translate(-10px, -10px);
+    box-shadow: 10px 10px 0 var(--hover-color);
+    border-color: var(--hover-color);
+}
+
+.card:hover .cardTitle {
+    color: var(--hover-color);
+}

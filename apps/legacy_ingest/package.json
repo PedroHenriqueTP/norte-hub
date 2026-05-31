@@ -1,0 +1,20 @@
+{
+  "name": "norte-ecosystem",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "packages/*",
+    "systems/*",
+    "systems/norte-delivery/apps/*",
+    "systems/norte-delivery/packages/*",
+    "core/*"
+  ],
+  "scripts": {
+    "db:generate": "npx --prefix systems/norte-delivery prisma generate --schema=packages/database/prisma/schema.prisma",
+    "db:push": "npx --prefix systems/norte-delivery prisma db push --schema=packages/database/prisma/schema.prisma",
+    "db:migrate": "npx --prefix systems/norte-delivery prisma migrate dev --schema=packages/database/prisma/schema.prisma"
+  },
+  "devDependencies": {
+    "turbo": "^1.10.0"
+  }
+}

@@ -1,0 +1,1 @@
+﻿Vaccum_Impact_Sound_Profile: SubFreq(40Hz), Release(200ms), Tone(Crystal)

@@ -1,0 +1,11 @@
+open-interpreter
+faster-whisper
+sounddevice
+numpy
+scipy
+edge-tts
+pyaudio
+# We use torch and torchaudio for silero VAD natively
+torch
+torchaudio
+pygame

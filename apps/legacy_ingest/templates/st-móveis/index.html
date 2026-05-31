@@ -1,0 +1,227 @@
+﻿<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ST MÃ³veis | Marcenaria de Alto PadrÃ£o</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap"
+        rel="stylesheet">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+    <!-- Header -->
+    <header class="main-header" id="header">
+        <div class="container nav-container">
+            <a href="#" class="logo">ST MÃ“VEIS</a>
+            <nav>
+                <ul class="nav-links">
+                    <li><a href="#portfolio">PortfÃ³lio</a></li>
+                    <li><a href="#process">O Processo</a></li>
+                    <li><a href="#about">Sobre</a></li>
+                    <li><a href="#contact">Contato</a></li>
+                </ul>
+            </nav>
+            <a href="#budget" class="btn btn-outline">OrÃ§amento</a>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <img src="assets/hero-bg.png" alt="Ambiente de luxo" class="hero-bg" id="hero-bg">
+        <div class="container hero-content">
+            <h1>MÃ³veis sob medida <br>em alto padrÃ£o</h1>
+            <p class="subtitle">Exclusividade e sofisticaÃ§Ã£o para transformar seu ambiente em uma obra de arte.</p>
+            <a href="#budget" class="btn btn-primary">Solicitar OrÃ§amento Exclusivo</a>
+        </div>
+    </section>
+
+    <!-- Authority Strip -->
+    <section class="authority-strip"
+        style="background: var(--color-bg-section); padding: 3rem 0; border-bottom: 1px solid rgba(255,255,255,0.05);">
+        <div class="container"
+            style="display: flex; justify-content: space-around; flex-wrap: wrap; text-align: center; gap: 2rem;">
+            <div class="stat-item">
+                <span class="number"
+                    style="font-family: var(--font-heading); font-size: 2.5rem; color: var(--color-accent); display: block;">15+</span>
+                <span class="label"
+                    style="font-size: 0.9rem; color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: 1px;">Anos
+                    de ExcelÃªncia</span>
+            </div>
+            <div class="stat-item">
+                <span class="number"
+                    style="font-family: var(--font-heading); font-size: 2.5rem; color: var(--color-accent); display: block;">500+</span>
+                <span class="label"
+                    style="font-size: 0.9rem; color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: 1px;">Projetos
+                    Entregues</span>
+            </div>
+            <div class="stat-item">
+                <span class="number"
+                    style="font-family: var(--font-heading); font-size: 2.5rem; color: var(--color-accent); display: block;">100%</span>
+                <span class="label"
+                    style="font-size: 0.9rem; color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: 1px;">SatisfaÃ§Ã£o</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section class="section" id="testimonials">
+        <div class="container">
+            <div class="section-header">
+                <h2>O Que Dizem Nossos Clientes</h2>
+                <p class="section-subtitle">A satisfaÃ§Ã£o de quem vive com nossa arte diariamente.</p>
+            </div>
+
+            <div class="testimonials-carousel">
+                <!-- Item 1 -->
+                <div class="testimonial-item active">
+                    <img src="assets/client-man-1.png" alt="Ricardo Almeida" class="client-photo">
+                    <div class="testimonial-content">
+                        <p class="quote">"Transformaram minha visÃ£o em realidade. A atenÃ§Ã£o aos detalhes do closet foi
+                            impressionante. Absolutamente recomendados."</p>
+                        <h4 class="client-name">Ricardo Almeida</h4>
+                        <p class="client-role">Arquiteto</p>
+                    </div>
+                </div>
+                <!-- Item 2 -->
+                <div class="testimonial-item">
+                    <img src="assets/client-woman-1.png" alt="Sofia Martins" class="client-photo">
+                    <div class="testimonial-content">
+                        <p class="quote">"Minha cozinha nova Ã© o coraÃ§Ã£o da casa. Funcionalidade e beleza em perfeita
+                            harmonia. O atendimento foi impecÃ¡vel."</p>
+                        <h4 class="client-name">Sofia Martins</h4>
+                        <p class="client-role">Designer de Interiores</p>
+                    </div>
+                </div>
+                <!-- Item 3 -->
+                <div class="testimonial-item">
+                    <img src="assets/client-man-2.png" alt="Carlos Eduardo" class="client-photo">
+                    <div class="testimonial-content">
+                        <p class="quote">"Qualidade superior em cada peÃ§a. O home theater ficou exatamente como eu
+                            queria, sofisticado e moderno."</p>
+                        <h4 class="client-name">Carlos Eduardo</h4>
+                        <p class="client-role">EmpresÃ¡rio</p>
+                    </div>
+                </div>
+
+                <div class="carousel-controls">
+                    <button class="control-btn prev" onclick="moveSlide(-1)">&#10094;</button>
+                    <button class="control-btn next" onclick="moveSlide(1)">&#10095;</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Instagram Feed -->
+    <section class="section bg-dark" style="padding-bottom: 0;">
+        <div class="container">
+            <div class="section-header">
+                <h2>Siga @STMoveis</h2>
+                <p class="section-subtitle">InspiraÃ§Ã£o diÃ¡ria em nosso Instagram.</p>
+            </div>
+        </div>
+        <div class="instagram-grid">
+            <img src="assets/instagram-1.png" alt="Detalhe Madeira">
+            <img src="assets/instagram-2.png" alt="Detalhe MÃ¡rmore">
+            <img src="assets/instagram-3.png" alt="Detalhe Couro">
+            <img src="assets/portfolio-kitchen.png" alt="Cozinha">
+            <img src="assets/portfolio-closet.png" alt="Closet">
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="main-footer" id="contact">
+        <div class="container footer-content">
+            <div class="footer-col">
+                <h3>ST MÃ“VEIS</h3>
+                <p>Marcenaria de alto padrÃ£o focada em transformar sonhos em realidade atravÃ©s de design exclusivo e
+                    materiais nobres.</p>
+            </div>
+            <div class="footer-col">
+                <h3>Contato</h3>
+                <p>Av. Europa, 1234 - Jardins, SP</p>
+                <p>contato@stmoveis.com.br</p>
+                <p>+55 (11) 99999-9999</p>
+            </div>
+            <div class="footer-col">
+                <h3>Newsletter</h3>
+                <form class="newsletter-form">
+                    <input type="email" placeholder="Seu melhor e-mail">
+                    <button type="submit" class="btn btn-primary">Assinar</button>
+                </form>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 ST MÃ³veis. Todos os direitos reservados.</p>
+        </div>
+    </footer>
+
+    <!-- Floating WhatsApp -->
+    <a href="https://wa.me/5511999999999" class="whatsapp-float" target="_blank">
+        <svg viewBox="0 0 24 24" width="30" height="30" fill="white">
+            <path
+                d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-8.68-2.031-.967-.272-.297-.471-.421-.92-.471-.446-.05-.892-.076-1.338-.076-.446 0-1.164.173-1.783.843-.619.669-2.399 2.346-2.399 5.722 0 3.377 2.448 6.639 2.769 7.086.321.444 4.843 7.398 11.728 10.372 4.542 1.962 5.466 1.579 6.432 1.48.966-.099 3.107-1.269 3.553-2.493.446-1.225.446-2.275.322-2.493z" />
+        </svg>
+    </a>
+
+    <!-- Budget Modal -->
+    <div id="budget-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2>Solicitar OrÃ§amento Exclusivo</h2>
+            <p>Preencha os dados abaixo para iniciarmos a conversa sobre seu projeto.</p>
+            <form class="budget-form">
+                <div class="form-group">
+                    <label>Nome Completo</label>
+                    <input type="text" required>
+                </div>
+                <div class="form-group">
+                    <label>E-mail</label>
+                    <input type="email" required>
+                </div>
+                <div class="form-group">
+                    <label>Telefone / WhatsApp</label>
+                    <input type="tel" required>
+                </div>
+                <div class="form-group">
+                    <label>Tipo de Ambiente</label>
+                    <select>
+                        <option>Cozinha</option>
+                        <option>DormitÃ³rio / Closet</option>
+                        <option>Living / Home Theater</option>
+                        <option>Banheiro</option>
+                        <option>Corporativo</option>
+                        <option>Outro</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>PrevisÃ£o de InÃ­cio</label>
+                    <select>
+                        <option>Imediato</option>
+                        <option>Em 30 dias</option>
+                        <option>Em 3 meses</option>
+                        <option>Em 6 meses ou mais</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Detalhes do Projeto</label>
+                    <textarea rows="4"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Enviar SolicitaÃ§Ã£o</button>
+            </form>
+        </div>
+    </div>
+
+    <footer style='text-align: center; padding: 20px; font-family: sans-serif; opacity: 0.7;'>A Norte Systems Solution</footer>
+</body>
+
+</html>

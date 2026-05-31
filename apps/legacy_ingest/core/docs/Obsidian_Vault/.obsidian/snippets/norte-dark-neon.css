@@ -1,0 +1,15 @@
+﻿.theme-dark {
+  --background-primary: #0A0A0A;
+  --background-secondary: #111111;
+  --text-normal: #E0E0E0;
+  --text-accent: #00FFFF;
+  --interactive-accent: #00FF9D;
+}
+
+.graph-view.color-fill {
+  color: #00FF9D;
+}
+
+.graph-view.color-line {
+  color: #00FFFF33;
+}

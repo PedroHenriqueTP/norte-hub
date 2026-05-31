@@ -1,0 +1,9 @@
+Tá faltando muita coisa kkkkk engraçado foi shift shift
+'''Landing Page Design'''
+Tirar o Pricing
+Mostrar Funcionalidades da Dashboard
+expandir sections e scroll down animations
+adicionar páginas de quem somos, nosso propósito, contatos
+adicionar animações constantes às sections já preparadas
+expandir as sections
+simular um job no Hero

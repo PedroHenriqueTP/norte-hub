@@ -1,0 +1,21 @@
+.main {
+  min-height: 100vh;
+  position: relative;
+}
+
+.sectionPlaceholder {
+  height: 50vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border-bottom: var(--border-width) solid var(--border-color);
+  background-color: var(--bg-color);
+  /* Cover the background for readability */
+  text-align: center;
+}
+
+.sectionPlaceholder h2 {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+}

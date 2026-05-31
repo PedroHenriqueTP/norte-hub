@@ -1,0 +1,68 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Tenant {
+  id        String           @id @default(uuid())
+  name      String
+  planTier  PlanTier         @default(BASIC)
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+  users     User[]
+  features  TenantFeature[]
+  products  DigitalProduct[]
+  oauthVaults OAuthVault[]
+}
+
+enum PlanTier {
+  BASIC
+  PRO
+  ENTERPRISE
+}
+
+model TenantFeature {
+  id        String   @id @default(uuid())
+  tenantId  String
+  tenant    Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  moduleKey String
+  isActive  Boolean  @default(false)
+  updatedAt DateTime @updatedAt
+
+  @@unique([tenantId, moduleKey])
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  name      String?
+  tenantId  String
+  tenant    Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model DigitalProduct {
+  id            String   @id @default(uuid())
+  name          String
+  moduleMapping Json
+  tenantId      String
+  tenant        Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model OAuthVault {
+  id           String   @id @default(uuid())
+  provider     String
+  encryptedKey String
+  iv           String
+  tenantId     String
+  tenant       Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}

@@ -1,0 +1,69 @@
+🟢 Fase 1: Burocracia e Contas (O Alicerce)
+Sem isso, seu bot será bloqueado ou terá limites baixíssimos de mensagens.
+
+[ ] Empresa Formalizada: Tenha um CNPJ ativo e um site funcional (essencial para a verificação).
+
+[ ] Conta no Meta for Developers: Crie sua conta em developers.facebook.com.
+
+[ ] Criação do App: Crie um aplicativo do tipo "Business" dentro do painel da Meta.
+
+[ ] Configuração do WhatsApp: Adicione o produto "WhatsApp" ao seu App.
+
+[ ] Verificação da Empresa (Business Manager): Envie os documentos da empresa para a Meta para remover as restrições de envio.
+
+[ ] Número de Telefone: Registre um número que não tenha conta ativa no aplicativo WhatsApp comum (se tiver, você precisará deletar a conta do app antes de migrar para a API).
+
+🔵 Fase 2: Ambiente de Desenvolvimento (A Stack)
+Preparando o "terreno" onde o código vai rodar.
+
+[ ] Servidor/Hospedagem: Escolha uma plataforma (Ex: Render, Railway ou AWS).
+
+[ ] Domínio com SSL: Seu webhook precisa de uma URL https://.
+
+[ ] Banco de Dados: Instale e configure o PostgreSQL (para agendamentos) e o Redis (para estados da conversa).
+
+[ ] Token de Acesso Permanente: No painel da Meta, gere um token de sistema que nunca expira (não use o token temporário de 24h).
+
+🟡 Fase 3: Desenvolvimento do Bot (O Código)
+Onde a mágica acontece.
+
+[ ] Validação do Webhook: Implemente a rota GET para o "Handshake" com a Meta.
+
+[ ] Recepção de Mensagens: Implemente a rota POST para receber os JSONs de mensagens.
+
+[ ] Lógica de Estados (FSM): Crie a lógica:
+
+Estado 0: Saudação.
+
+Estado 1: Coleta de Nome.
+
+Estado 2: Coleta de Data/Hora.
+
+[ ] Integração com Agenda: Conecte o código a uma API de calendário (Google Calendar ou banco local).
+
+[ ] Componentes Interativos: Troque mensagens de texto puro por Botões e Listas (melhora muito a experiência).
+
+🔴 Fase 4: Testes e Homologação (O Refino)
+Não pule esta fase para evitar erros em massa.
+
+[ ] Teste de Opt-out: Garanta que se o usuário digitar "Sair" ou "Parar", o bot pare de enviar mensagens.
+
+[ ] Tratamento de Erros: O que o bot faz se o usuário enviar um áudio ou uma imagem no lugar da data?
+
+[ ] Aprovação de templates: Se você for iniciar conversas (notificações), crie e aprove os templates de mensagens no painel da Meta.
+
+[ ] Monitoramento de Erros: Configure algo como Sentry ou logs estruturados para saber quando o bot "quebrar".
+
+🟣 Fase 5: Go-Live (Produção)
+[ ] Configuração Final do Webhook: Aponte a URL oficial no painel da Meta e ative as inscrições de "messages".
+
+[ ] Migração de Créditos: Configure o método de pagamento no Gerenciador de Negócios (as primeiras 1.000 conversas de serviço/mês costumam ser gratuitas, mas o cartão deve estar lá).
+
+[ ] Divulgação: Crie um link direto (wa.me/seunúmero) e coloque no seu Instagram/Site.
+
+Resumo de Custos Previstos (2026)
+Meta API: Cobrado por conversa (sessão de 24h).
+
+Hospedagem: Aproximadamente $5 - $20/mês (em instâncias pequenas).
+
+Banco de Dados: Geralmente incluso no plano de hospedagem ou gratuito no início (Supabase/Render).

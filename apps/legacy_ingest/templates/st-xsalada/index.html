@@ -1,0 +1,218 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Hamburgueria artesanal premium - Sabor que marca, hambÃºrguer que conquista. HambÃºrgueres gourmet com carne selecionada.">
+    <title>Burger House - Hamburgueria Artesanal Premium</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Header -->
+    <header id="header">
+        <div class="container">
+            <div class="logo">
+                <h1>Burger<span>House</span></h1>
+            </div>
+            <nav id="nav">
+                <button class="mobile-menu" id="mobile-menu-btn" aria-label="Menu">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+                <ul id="nav-list">
+                    <li><a href="#home">Home</a></li>
+                    <li><a href="#sobre">Sobre</a></li>
+                    <li><a href="#cardapio">CardÃ¡pio</a></li>
+                    <li><a href="#localizacao">LocalizaÃ§Ã£o</a></li>
+                    <li><a href="#contato">Contato</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section with Carousel -->
+    <section id="home" class="hero">
+        <div class="carousel">
+            <div class="carousel-inner">
+                <div class="carousel-item active">
+                    <img src="images/hero-burger-preparation.jpg" alt="HambÃºrguer artesanal sendo preparado na chapa">
+                </div>
+                <div class="carousel-item">
+                    <img src="images/hero-burger-closeup.jpg" alt="Close-up de hambÃºrguer gourmet com queijo derretido">
+                </div>
+                <div class="carousel-item">
+                    <img src="images/hero-restaurant-interior.jpg" alt="Ambiente interno da hamburgueria com clientes">
+                </div>
+            </div>
+            <button class="carousel-control prev" aria-label="Anterior">â€¹</button>
+            <button class="carousel-control next" aria-label="PrÃ³ximo">â€º</button>
+            <div class="carousel-indicators">
+                <button class="active" data-slide="0" aria-label="Slide 1"></button>
+                <button data-slide="1" aria-label="Slide 2"></button>
+                <button data-slide="2" aria-label="Slide 3"></button>
+            </div>
+        </div>
+        <div class="hero-overlay">
+            <div class="hero-content">
+                <h2 class="hero-title">Sabor que marca,<br>hambÃºrguer que conquista</h2>
+                <a href="#cardapio" class="btn btn-primary">Ver CardÃ¡pio</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Quem Somos Section -->
+    <section id="sobre" class="sobre">
+        <div class="container">
+            <div class="sobre-content reveal">
+                <div class="sobre-text">
+                    <h2>Quem Somos</h2>
+                    <p class="subtitle">PaixÃ£o por hambÃºrgueres artesanais</p>
+                    <p>Na <strong>Burger House</strong>, acreditamos que um hambÃºrguer perfeito comeÃ§a com ingredientes de qualidade excepcional. Nossa paixÃ£o Ã© criar experiÃªncias gastronÃ´micas memorÃ¡veis atravÃ©s de hambÃºrgueres artesanais feitos com carne 100% selecionada.</p>
+                    <p>Cada hambÃºrguer Ã© preparado com dedicaÃ§Ã£o e amor, combinando tÃ©cnicas tradicionais com toques modernos. Nosso compromisso Ã© oferecer nÃ£o apenas uma refeiÃ§Ã£o, mas uma experiÃªncia que marca o paladar e conquista o coraÃ§Ã£o.</p>
+                    <p>Venha conhecer o sabor autÃªntico de um hambÃºrguer verdadeiramente artesanal, preparado por chefs apaixonados pelo que fazem.</p>
+                </div>
+                <div class="sobre-image">
+                    <img src="images/chef-preparing.jpg" alt="Chef preparando hambÃºrgueres artesanais">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Nosso CardÃ¡pio Section -->
+    <section id="cardapio" class="cardapio">
+        <div class="container">
+            <h2 class="section-title reveal">Nosso CardÃ¡pio</h2>
+            <p class="section-subtitle reveal">Descubra nossos sabores exclusivos</p>
+            <div class="cardapio-grid">
+                <div class="card reveal">
+                    <div class="card-icon">ðŸ”</div>
+                    <h3>HambÃºrgueres Artesanais</h3>
+                    <p>Carnes nobres, pÃ£o artesanal e ingredientes frescos selecionados diariamente.</p>
+                </div>
+                <div class="card reveal">
+                    <div class="card-icon">ðŸŸ</div>
+                    <h3>Batatas Especiais</h3>
+                    <p>Batatas rÃºsticas, fritas na perfeiÃ§Ã£o com temperos exclusivos da casa.</p>
+                </div>
+                <div class="card reveal">
+                    <div class="card-icon">ðŸ¥¤</div>
+                    <h3>Milkshakes Cremosos</h3>
+                    <p>Shakes artesanais com sorvete premium e coberturas irresistÃ­veis.</p>
+                </div>
+                <div class="card reveal">
+                    <div class="card-icon">ðŸ‘¨â€ðŸ‘©â€ðŸ‘§â€ðŸ‘¦</div>
+                    <h3>Combos FamÃ­lia</h3>
+                    <p>OpÃ§Ãµes completas para toda a famÃ­lia aproveitar juntos.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Onde Estamos Section -->
+    <section id="localizacao" class="localizacao">
+        <div class="container">
+            <h2 class="section-title reveal">Onde Estamos</h2>
+            <div class="localizacao-content reveal">
+                <div class="map-container">
+                    <iframe 
+                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3657.0977!2d-46.6333!3d-23.5505!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMjPCsDMzJzAxLjgiUyA0NsKwMzcnNTkuOSJX!5e0!3m2!1spt-BR!2sbr!4v1234567890"
+                        width="100%" 
+                        height="400" 
+                        style="border:0;" 
+                        allowfullscreen="" 
+                        loading="lazy" 
+                        referrerpolicy="no-referrer-when-downgrade">
+                    </iframe>
+                </div>
+                <div class="localizacao-info">
+                    <h3>Visite-nos</h3>
+                    <p><strong>EndereÃ§o:</strong><br>Rua dos Sabores, 123 - Centro<br>SÃ£o Paulo, SP - CEP 01234-567</p>
+                    <p><strong>HorÃ¡rio de Funcionamento:</strong><br>
+                        Segunda a Quinta: 18h - 23h<br>
+                        Sexta e SÃ¡bado: 18h - 00h<br>
+                        Domingo: 18h - 22h
+                    </p>
+                    <a href="https://maps.google.com/?q=Burger+House+SÃ£o+Paulo" target="_blank" class="btn btn-secondary">Abrir no Google Maps</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Entre em Contato Section (Lead Magnet) -->
+    <section id="contato" class="contato">
+        <div class="container">
+            <div class="contato-content reveal">
+                <h2>Ganhe batata grÃ¡tis na sua primeira compra!</h2>
+                <p class="lead-subtitle">Cadastre-se para receber um cupom de 20% de desconto + batata grÃ¡tis na sua primeira visita e assine nossa newsletter.</p>
+                <form id="contact-form" class="contact-form">
+                    <div class="form-group">
+                        <input type="text" id="name" name="name" placeholder="Seu nome" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="email" id="email" name="email" placeholder="Seu e-mail" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Quero meu cupom!</button>
+                </form>
+                <div class="social-links">
+                    <p>Siga-nos nas redes sociais:</p>
+                    <div class="social-icons">
+                        <a href="https://instagram.com" target="_blank" aria-label="Instagram">
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                            </svg>
+                        </a>
+                        <a href="https://facebook.com" target="_blank" aria-label="Facebook">
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <h2>Burger<span>House</span></h2>
+                    <p>Sabor que marca, hambÃºrguer que conquista</p>
+                </div>
+                <nav class="footer-nav">
+                    <ul>
+                        <li><a href="#home">Home</a></li>
+                        <li><a href="#sobre">Sobre</a></li>
+                        <li><a href="#cardapio">CardÃ¡pio</a></li>
+                        <li><a href="#localizacao">LocalizaÃ§Ã£o</a></li>
+                        <li><a href="#contato">Contato</a></li>
+                    </ul>
+                </nav>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 Burger House. Todos os direitos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Floating WhatsApp Button -->
+    <a href="https://wa.me/5511999999999?text=OlÃ¡!%20Gostaria%20de%20fazer%20um%20pedido" 
+       class="whatsapp-float" 
+       target="_blank" 
+       aria-label="WhatsApp">
+        <svg width="60" height="60" viewBox="0 0 24 24" fill="white">
+            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+        </svg>
+    </a>
+
+    <script src="script.js"></script>
+
+    <footer style='text-align: center; padding: 20px; font-family: sans-serif; opacity: 0.7;'>A Norte Systems Solution</footer>
+</body>
+</html>
+
