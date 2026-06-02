@@ -4,11 +4,13 @@
 C:.
 └───norte-hub
     ├───package.json
+    ├───sync_snapshot.ps1
     ├───.nortehub
     │   ├───config
     │   │       agents-manifest.json
     │   │
     │   └───modules
+    │           @agent-context-oracle.md
     │           @architecture.md
     │           @project-tree.md
     │           @security-tenant.md

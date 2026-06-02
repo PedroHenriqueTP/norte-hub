@@ -1,0 +1,11 @@
+{
+  "name": "@norte/database",
+  "version": "1.0.0",
+  "description": "Shared database client package for Norte Global Hub",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "dependencies": {
+    "@prisma/client": "^5.22.0"
+  },
+  "private": true
+}

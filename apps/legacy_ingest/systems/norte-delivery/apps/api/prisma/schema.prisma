@@ -1,0 +1,339 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+
+// --- ENUMS (Domínios fixos) ---
+
+enum Role {
+  OWNER      // Dono do Tenant (SaaS)
+  ADMIN      // Gerente da Loja
+  KITCHEN    // Ecrã da cozinha
+  DRIVER     // Estafeta/Entregador
+  CUSTOMER   // Cliente Final
+  STAFF      // Funcionário genérico
+}
+
+enum OrderStatus {
+  PENDING     // Aguardando aprovação
+  CONFIRMED   // Aceite pela loja
+  PREPARING   // Na cozinha
+  READY       // Pronto para entrega
+  DELIVERING  // Saiu para entrega
+  COMPLETED   // Entregue
+  CANCELED    // Cancelado
+}
+
+enum OrderSource {
+  OWN_APP     // Nosso PWA / Site / App Nativa
+  IFOOD       // Integração
+  UBER_EATS   // Integração
+  WHATSAPP    // Manual
+  POS         // Balcão
+}
+
+enum PaymentMethod {
+  CREDIT_CARD
+  DEBIT_CARD
+  PIX         // MB WAY (se fosse PT-PT) ou Pix (BR)
+  CASH
+  VOUCHER
+}
+
+enum TransactionType {
+  INCOME      // Venda (Entrada)
+  EXPENSE     // Taxa do iFood, Custo de produto (Saída)
+  REFUND      // Estorno
+}
+
+// --- MODELOS ---
+
+model Tenant {
+  id          String   @id @default(uuid())
+  name        String
+  slug        String   @unique // Ex: 'pizzaria-luigi'
+  plan        String   @default("FREE") // FREE, PRO, ENTERPRISE
+  createdAt   DateTime @default(now())
+
+  // Relacionamentos
+  // Relacionamentos
+  users       User[]
+  products    Product[]
+  orders      Order[]
+  categories  Category[]
+  transactions Transaction[]
+  addresses   Address[]
+  integrations Integration[]
+  subscription Subscription?
+  workouts      Workout[]
+  dietLogs      DietLog[]
+  musicProjects MusicProject[]
+
+  @@map("tenants")
+}
+
+model Subscription {
+  id              String   @id @default(uuid())
+  tenantId        String   @unique
+  tenant          Tenant   @relation(fields: [tenantId], references: [id])
+  
+  status          String   // ACTIVE, PAST_DUE, CANCELED, TRIALING
+  planId          String   // 'price_...' (Stripe Price ID)
+  currentPeriodEnd DateTime
+  customerId      String   // 'cus_...' (Stripe Customer ID)
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@map("subscriptions")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  password  String   // Hash
+  phone     String?
+  role      Role     @default(CUSTOMER)
+  createdAt DateTime @default(now())
+
+  // Multi-Tenant
+  tenantId  String
+  tenant    Tenant   @relation(fields: [tenantId], references: [id])
+
+  orders    Order[]
+  addresses Address[]
+  
+  workouts      Workout[]
+  dietLogs      DietLog[]
+  musicProjects MusicProject[]
+
+  @@map("users")
+}
+
+model Address {
+  id           String  @id @default(uuid())
+  street       String
+  number       String
+  complement   String?
+  neighborhood String
+  city         String
+  zipCode      String
+  
+  userId       String
+  user         User    @relation(fields: [userId], references: [id])
+  
+  // Multi-Tenant (Endereços também pertencem ao contexto do tenant)
+  tenantId     String
+  tenant       Tenant  @relation(fields: [tenantId], references: [id])
+
+  orders       Order[] 
+
+  @@map("addresses")
+}
+
+model Category {
+  id       String    @id @default(uuid())
+  name     String
+  
+  tenantId String
+  tenant   Tenant    @relation(fields: [tenantId], references: [id])
+
+  products Product[]
+
+  @@map("categories")
+}
+
+model Product {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  price       Decimal  @db.Decimal(10, 2)
+  imageUrl    String?
+  isActive    Boolean  @default(true)
+  
+  categoryId  String
+  category    Category @relation(fields: [categoryId], references: [id])
+  
+  tenantId    String
+  tenant      Tenant   @relation(fields: [tenantId], references: [id])
+
+  orderItems  OrderItem[]
+
+  @@map("products")
+}
+
+// O Coração do Sistema
+model Order {
+  id            String      @id @default(uuid())
+  incrementalId Int         @default(autoincrement()) 
+  
+  // Relações
+  userId        String?     
+  user          User?       @relation(fields: [userId], references: [id])
+  addressId     String?
+  address       Address?    @relation(fields: [addressId], references: [id])
+  
+  tenantId      String
+  tenant        Tenant      @relation(fields: [tenantId], references: [id])
+
+  // Valores
+  subtotal      Decimal     @db.Decimal(10, 2) 
+  deliveryFee   Decimal     @db.Decimal(10, 2) @default(0.00)
+  discount      Decimal     @db.Decimal(10, 2) @default(0.00)
+  total         Decimal     @db.Decimal(10, 2) 
+
+  // Controlo
+  status        OrderStatus @default(PENDING)
+  source        OrderSource @default(OWN_APP)
+  
+  // Integrações 
+  externalId    String?     @unique 
+  
+  notes         String?     
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  items         OrderItem[]
+  transactions  Transaction[]
+
+  @@map("orders")
+}
+
+model OrderItem {
+  id        String  @id @default(uuid())
+  orderId   String
+  order     Order   @relation(fields: [orderId], references: [id])
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+
+  quantity  Int
+  price     Decimal @db.Decimal(10, 2) 
+  
+  observation String? 
+
+  @@map("order_items")
+}
+
+// Módulo Financeiro
+model Transaction {
+  id            String          @id @default(uuid())
+  amount        Decimal         @db.Decimal(10, 2)
+  type          TransactionType
+  description   String?         
+  
+  paymentMethod PaymentMethod?
+  
+  tenantId      String
+  tenant        Tenant          @relation(fields: [tenantId], references: [id])
+  
+  // Reconciliação
+  netAmount     Decimal?        @db.Decimal(10, 2) 
+  feeAmount     Decimal?        @db.Decimal(10, 2) 
+
+  orderId       String?
+  order         Order?          @relation(fields: [orderId], references: [id])
+
+  createdAt     DateTime        @default(now())
+
+  @@map("transactions")
+}
+
+enum IntegrationProvider {
+  IFOOD
+  RAPPI
+  UBER_EATS
+}
+
+model Integration {
+  id          String   @id @default(uuid())
+  provider    IntegrationProvider
+  isActive    Boolean  @default(false)
+  
+  // Credentials
+  merchantId  String?  
+  accessToken String?  
+  refreshToken String?
+  clientId     String?
+  clientSecret String?
+  
+  // Flexible config
+  settings    Json?    
+  
+  tenantId    String
+  tenant      Tenant   @relation(fields: [tenantId], references: [id])
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([tenantId, provider])
+  @@map("integrations")
+}
+
+// --- SOBERANIA ---
+
+model Workout {
+  id             String   @id @default(uuid())
+  userId         String
+  user           User     @relation(fields: [userId], references: [id])
+  tenantId       String
+  tenant         Tenant   @relation(fields: [tenantId], references: [id])
+  title          String
+  exercises      Json
+  date           DateTime @default(now())
+  durationMinutes Int?
+  notes          String?
+}
+
+model DietLog {
+  id             String   @id @default(uuid())
+  userId         String
+  user           User     @relation(fields: [userId], references: [id])
+  tenantId       String
+  tenant         Tenant   @relation(fields: [tenantId], references: [id])
+  date           DateTime @default(now())
+  meals          Json
+  totalCalories  Int
+  protein        Float
+  carbs          Float
+  fats           Float
+}
+
+model KnowledgeNode {
+  id        String   @id @default(uuid())
+  title     String
+  content   String?
+  category  String
+  color     String   @default("#00F2FF")
+  tags      String[]
+  createdAt DateTime @default(now())
+}
+
+model MusicProject {
+  id         String   @id @default(uuid())
+  title      String
+  genre      String
+  bpm        Int?
+  key        String?
+  samplePath String?
+  status     String
+  userId     String
+  user       User     @relation(fields: [userId], references: [id])
+  tenantId   String
+  tenant     Tenant   @relation(fields: [tenantId], references: [id])
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model WaitingList {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  name      String?
+  status    String   @default("WAITING")
+  createdAt DateTime @default(now())
+}

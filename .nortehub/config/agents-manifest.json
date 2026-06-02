@@ -25,6 +25,16 @@
         "Interceptação de chat web",
         "Indexação de caminhos locais"
       ]
+    },
+    {
+      "id": "agent-context-oracle",
+      "name": "Context Oracle",
+      "primary_skill": "Monitorar o progresso do desenvolvimento local e gerar resumos executivos de alto contexto para o LLM Diretor (Gemini).",
+      "scope": [
+        "Monitorar commits locais",
+        "Monitorar schemas do Prisma",
+        "Monitorar build e status do ecossistema"
+      ]
     }
   ]
 }

@@ -1,0 +1,35 @@
+# Base stage
+FROM node:18-alpine AS base
+
+# Dependencies stage
+FROM base AS deps
+WORKDIR /app
+COPY package.json package-lock.json ./
+COPY apps/api/package.json apps/api/
+COPY packages/database/package.json packages/database/
+# Install dependencies (including devDependencies for build)
+RUN npm ci
+
+# Build stage
+FROM base AS builder
+WORKDIR /app
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
+
+# Generate Prisma Client
+RUN npm run db:generate -w apps/api
+
+# Build API
+RUN cd apps/api && npm run build
+
+# Production stage
+FROM base AS runner
+WORKDIR /app
+ENV NODE_ENV=production
+
+COPY --from=builder /app/apps/api/dist ./dist
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/apps/api/package.json ./package.json
+
+EXPOSE 3000
+CMD ["node", "dist/main.js"]

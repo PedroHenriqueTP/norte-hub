@@ -1,0 +1,56 @@
+{
+  "name": "PrismaClientKnownRequestError",
+  "code": "P2022",
+  "clientVersion": "5.22.0",
+  "meta": {
+    "modelName": "Subscription",
+    "column": "trialEndsAt"
+  }
+}
+PrismaClientKnownRequestError: 
+Invalid `tx.subscription.create()` invocation in
+C:\Users\ACER\Desktop\delivery-platform\apps\api\dist\modules\auth\auth.service.js:88:39
+
+  85 });
+  86 const trialEndsAt = new Date();
+  87 trialEndsAt.setDate(trialEndsAt.getDate() + 7);
+→ 88 await tx.subscription.create(
+The column `trialEndsAt` does not exist in the current database.
+    at $n.handleRequestError (C:\Users\ACER\Desktop\delivery-platform\node_modules\@prisma\client\runtime\library.js:121:7315)
+    at $n.handleAndLogRequestError (C:\Users\ACER\Desktop\delivery-platform\node_modules\@prisma\client\runtime\library.js:121:6623)
+    at $n.request (C:\Users\ACER\Desktop\delivery-platform\node_modules\@prisma\client\runtime\library.js:121:6307)
+    at async l (C:\Users\ACER\Desktop\delivery-platform\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async C:\Users\ACER\Desktop\delivery-platform\apps\api\dist\modules\auth\auth.service.js:88:17
+    at async Proxy._transactionWithCallback (C:\Users\ACER\Desktop\delivery-platform\node_modules\@prisma\client\runtime\library.js:130:8000)
+    at async AuthService.register (C:\Users\ACER\Desktop\delivery-platform\apps\api\dist\modules\auth\auth.service.js:69:28)
+    at async C:\Users\ACER\Desktop\delivery-platform\node_modules\@nestjs\core\router\router-execution-context.js:46:28
+    at async C:\Users\ACER\Desktop\delivery-platform\node_modules\@nestjs\core\router\router-proxy.js:9:17
+---
+{
+  "name": "PrismaClientKnownRequestError",
+  "code": "P2022",
+  "clientVersion": "5.22.0",
+  "meta": {
+    "modelName": "Subscription",
+    "column": "trialEndsAt"
+  }
+}
+PrismaClientKnownRequestError: 
+Invalid `tx.subscription.create()` invocation in
+C:\Users\ACER\Desktop\delivery-platform\apps\api\dist\modules\auth\auth.service.js:88:39
+
+  85 });
+  86 const trialEndsAt = new Date();
+  87 trialEndsAt.setDate(trialEndsAt.getDate() + 7);
+→ 88 await tx.subscription.create(
+The column `trialEndsAt` does not exist in the current database.
+    at $n.handleRequestError (C:\Users\ACER\Desktop\delivery-platform\node_modules\@prisma\client\runtime\library.js:121:7315)
+    at $n.handleAndLogRequestError (C:\Users\ACER\Desktop\delivery-platform\node_modules\@prisma\client\runtime\library.js:121:6623)
+    at $n.request (C:\Users\ACER\Desktop\delivery-platform\node_modules\@prisma\client\runtime\library.js:121:6307)
+    at async l (C:\Users\ACER\Desktop\delivery-platform\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async C:\Users\ACER\Desktop\delivery-platform\apps\api\dist\modules\auth\auth.service.js:88:17
+    at async Proxy._transactionWithCallback (C:\Users\ACER\Desktop\delivery-platform\node_modules\@prisma\client\runtime\library.js:130:8000)
+    at async AuthService.register (C:\Users\ACER\Desktop\delivery-platform\apps\api\dist\modules\auth\auth.service.js:69:28)
+    at async C:\Users\ACER\Desktop\delivery-platform\node_modules\@nestjs\core\router\router-execution-context.js:46:28
+    at async C:\Users\ACER\Desktop\delivery-platform\node_modules\@nestjs\core\router\router-proxy.js:9:17
+---
