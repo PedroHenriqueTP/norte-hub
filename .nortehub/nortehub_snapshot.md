@@ -8,7 +8,7 @@
 #### 2. ALTERACOES DE ENGENHARIA (Ultimas modificacoes e commits)
 * **Banco de Dados:** Sem alteracoes de schema pendentes.
 * **Commits Recentes:**
-* chore(infra): remove heavy pptx asset to bypass github size limits (f0e0d69) * feat(api): implement transparent proxy multi-tenant isolation in PrismaService and fix type implicitAny in orders.service.ts (514f1ca) * chore(infra): fix escaping in sync_snapshot.ps1 and update snapshot (4802117)
+* test(api): add /orders/test-concurrency endpoint to validate AsyncLocalStorage context isolation (f906c21) * chore(infra): remove heavy pptx asset to bypass github size limits (f0e0d69) * feat(api): implement transparent proxy multi-tenant isolation in PrismaService and fix type implicitAny in orders.service.ts (514f1ca)
 
 #### 3. DEBITOS TECNICOS e DROPS DE CONTEXTO
 * Mapeamento do pacote `@norte/database` corrigido e centralizado sob `systems/norte-delivery/packages/database`.

@@ -121,4 +121,13 @@ describe('OrdersService', () => {
             }));
         });
     });
+
+    describe('testConcurrency', () => {
+        it('should validate context isolation under concurrency without leaks', async () => {
+            const result = await service.testConcurrency();
+            expect(result.total).toBe(100);
+            expect(result.successCount).toBe(100);
+            expect(result.failures.length).toBe(0);
+        });
+    });
 });
