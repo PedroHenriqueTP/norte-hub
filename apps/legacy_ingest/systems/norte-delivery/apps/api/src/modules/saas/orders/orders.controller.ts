@@ -16,6 +16,11 @@ import { OrdersService } from './orders.service';
 export class OrdersController {
   constructor(private readonly ordersService: OrdersService) { }
 
+  @Get('test-concurrency')
+  testConcurrency() {
+    return this.ordersService.testConcurrency();
+  }
+
   @Post()
   create(@Body() dto: CreateOrderDto) {
     return this.ordersService.create(dto);

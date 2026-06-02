@@ -317,5 +317,54 @@ export class OrdersService {
     });
     return user.id;
   }
+
+  async testConcurrency() {
+    const iterations = 100;
+    const promises = [];
+    const results = {
+      total: iterations,
+      successCount: 0,
+      failures: [] as any[]
+    };
+
+    for (let i = 0; i < iterations; i++) {
+      const expectedTenantId = `tenant-${i % 5}`; // 5 distinct tenants
+      
+      promises.push(
+        new Promise<void>((resolve) => {
+          TenantContext.run(expectedTenantId, async () => {
+            try {
+              // Introduce random async delay to force event loop context switching
+              await new Promise((r) => setTimeout(r, Math.random() * 50));
+              
+              // Verify active context in AsyncLocalStorage
+              const actualTenantId = TenantContext.getTenantId();
+              
+              if (actualTenantId !== expectedTenantId) {
+                results.failures.push({
+                  iteration: i,
+                  expected: expectedTenantId,
+                  actual: actualTenantId,
+                  type: 'ContextLeak'
+                });
+              } else {
+                results.successCount++;
+              }
+            } catch (err: any) {
+              results.failures.push({
+                iteration: i,
+                error: err.message
+              });
+            } finally {
+              resolve();
+            }
+          });
+        })
+      );
+    }
+
+    await Promise.all(promises);
+    return results;
+  }
 }
 

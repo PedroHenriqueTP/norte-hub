@@ -8,7 +8,7 @@
 #### 2. ALTERACOES DE ENGENHARIA (Ultimas modificacoes e commits)
 * **Banco de Dados:** Sem alteracoes de schema pendentes.
 * **Commits Recentes:**
-* feat(api): implement transparent proxy multi-tenant isolation in PrismaService and fix type implicitAny in orders.service.ts (f5c6bb6) * chore(infra): fix escaping in sync_snapshot.ps1 and update snapshot (4454ff3) * chore(infra): relocate delivery applications from node_modules to systems and fix workspace database mapping (1f96655)
+* chore(infra): remove heavy pptx asset to bypass github size limits (f0e0d69) * feat(api): implement transparent proxy multi-tenant isolation in PrismaService and fix type implicitAny in orders.service.ts (514f1ca) * chore(infra): fix escaping in sync_snapshot.ps1 and update snapshot (4802117)
 
 #### 3. DEBITOS TECNICOS e DROPS DE CONTEXTO
 * Mapeamento do pacote `@norte/database` corrigido e centralizado sob `systems/norte-delivery/packages/database`.
