@@ -6,9 +6,7 @@ import { VaultCrypto, EncryptedPayload } from "../../../packages/crypto/vault";
 export class BookshelfService {
   constructor(private prisma: PrismaService) {}
 
-  private getSecretKey(): string {
-    return process.env.VAULT_SECRET_KEY || "global-system-fallback-secret";
-  }
+
 
   async instantiateProduct(tenantId: string, solutionKey: string, config: Record<string, string>) {
     const product = await this.prisma.bookshelfProduct.findUnique({
@@ -19,11 +17,10 @@ export class BookshelfService {
       throw new NotFoundException(`Bookshelf product with key '${solutionKey}' not found`);
     }
 
-    const secret = this.getSecretKey();
     const configVault: Record<string, EncryptedPayload> = {};
 
     for (const [key, value] of Object.entries(config)) {
-      configVault[key] = VaultCrypto.encrypt(value, secret);
+      configVault[key] = VaultCrypto.encrypt(value);
     }
 
     return this.prisma.bookshelfLicense.upsert({
@@ -87,12 +84,11 @@ export class BookshelfService {
   async decryptConfig(tenantId: string, solutionKey: string): Promise<Record<string, string>> {
     const license = await this.getLicense(tenantId, solutionKey);
     const configVault = license.configVault as Record<string, EncryptedPayload>;
-    const secret = this.getSecretKey();
     const decryptedConfig: Record<string, string> = {};
 
     for (const [key, payload] of Object.entries(configVault)) {
       if (payload && payload.encryptedKey && payload.iv) {
-        decryptedConfig[key] = VaultCrypto.decrypt(payload.encryptedKey, payload.iv, secret);
+        decryptedConfig[key] = VaultCrypto.decrypt(payload.encryptedKey, payload.iv);
       }
     }
 

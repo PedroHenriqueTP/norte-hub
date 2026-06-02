@@ -7,8 +7,7 @@ export class ConnectionsService {
   constructor(private prisma: PrismaService) {}
 
   async saveConnection(tenantId: string, provider: string, rawToken: string) {
-    const secret = process.env.VAULT_SECRET_KEY || "global-system-fallback-secret";
-    const { encryptedKey, iv } = VaultCrypto.encrypt(rawToken, secret);
+    const { encryptedKey, iv } = VaultCrypto.encrypt(rawToken);
 
     return this.prisma.oAuthVault.create({
       data: {
