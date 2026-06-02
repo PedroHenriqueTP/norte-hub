@@ -8,7 +8,7 @@
 #### 2. ALTERACOES DE ENGENHARIA (Ultimas modificacoes e commits)
 * **Banco de Dados:** Sem alteracoes de schema pendentes.
 * **Commits Recentes:**
-* chore(infra): relocate delivery applications from node_modules to systems and fix workspace database mapping (1f96655) * feat(api): implement dynamic multi-tenant webhook router module in NestJS (2367015) * ci: configure paths-filtered workflows for lab web, api, and bookshelf modules (6e31b93)
+* chore(infra): fix escaping in sync_snapshot.ps1 and update snapshot (4454ff3) * chore(infra): relocate delivery applications from node_modules to systems and fix workspace database mapping (1f96655) * feat(api): implement dynamic multi-tenant webhook router module in NestJS (2367015)
 
 #### 3. DEBITOS TECNICOS e DROPS DE CONTEXTO
 * Mapeamento do pacote `@norte/database` corrigido e centralizado sob `systems/norte-delivery/packages/database`.

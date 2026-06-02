@@ -54,7 +54,7 @@ export class OrdersService {
     }
 
     const itemsData = dto.items.map((item) => {
-      const product = products.find((record) => record.id === item.productId);
+      const product = products.find((record: any) => record.id === item.productId);
       if (!product) {
         throw new BadRequestException(`Produto ${item.productId} não encontrado.`);
       }
