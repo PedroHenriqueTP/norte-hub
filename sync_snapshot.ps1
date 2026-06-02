@@ -63,10 +63,10 @@ $snapshotContent = "### SNAPSHOT DE DESENVOLVIMENTO: NORTE GLOBAL HUB`n`n" +
 "* **Banco de Dados:** $dbChanges`n" +
 "* **Commits Recentes:**`n$recentCommits`n`n" +
 "#### 3. DEBITOS TECNICOS e DROPS DE CONTEXTO`n" +
-"* Mapeamento do pacote `@norte/database` corrigido e centralizado sob `systems/norte-delivery/packages/database`.`n" +
-"* Conflito de hoisting do React no app `web` (React 19 vs 18) corrigido via instalacao local de peer dependencies.`n`n" +
+"* Mapeamento do pacote ``@norte/database`` corrigido e centralizado sob ``systems/norte-delivery/packages/database``.`n" +
+"* Conflito de hoisting do React no app ``web`` (React 19 vs 18) corrigido via instalacao local de peer dependencies.`n`n" +
 "#### 4. PROXIMO PASSO IMEDIATO BLOQUEANTE`n" +
-"* Revisar e commitar os arquivos reestruturados do `norte-delivery` e as novas configuracoes do `agent-context-oracle`."
+"* Configurar a autenticacao do Git para permitir o push para o repositorio remoto origin e validar a esteira de CI/CD."
 
 # Salvar o snapshot
 $outputPath = Join-Path $PSScriptRoot ".nortehub\nortehub_snapshot.md"
